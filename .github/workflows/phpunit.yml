@@ -8,13 +8,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.4.0
+        uses: actions/checkout@v4.2.2
 
       - name: Install composer and dependencies
         uses: php-actions/composer@v6
 
       - name: Run PHPUnit
-        uses: php-actions/phpunit@v3
+        uses: php-actions/phpunit@v4
         with:
           version: composer
           php_version: 8.4
@@ -24,7 +24,7 @@ jobs:
           coverage_clover: clover.xml
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./clover.xml
