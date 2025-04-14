@@ -1,9 +1,9 @@
-name: PHP CodeSniffer PSR-12
+name: Laravel Pint
 
 on: [push]
 
 jobs:
-  phpmd:
+  pint:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,10 +13,9 @@ jobs:
       - name: Install composer and dependencies
         uses: php-actions/composer@v6
 
-      - name: Run PHPCS
-        uses: php-actions/phpcs@v1
+      - name: Run Laravel Pint
+        uses: sergotail/laravel-pint-action@v2.0.0
         with:
-          version: composer
-          php_version: 8.4
-          path: src/,tests/
-          standard: phpcs.xml
+          useComposer: true
+          testMode: true
+          verboseMode: true

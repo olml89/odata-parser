@@ -2,7 +2,7 @@
 
 [![PHPUnit](https://github.com/olml89/odata-parser/actions/workflows/phpunit.yml/badge.svg)](https://github.com/olml89/odata-parser)
 [![Coverage](https://codecov.io/gh/olml89/odata-parser/branch/main/graph/badge.svg)](https://codecov.io/gh/olml89/odata-parser)
-[![PHPCS](https://github.com/olml89/odata-parser/actions/workflows/phpcs.yml/badge.svg)](https://github.com/olml89/odata-parser)
+[![Laravel Pint](https://github.com/olml89/odata-parser/actions/workflows/pint.yml/badge.svg)](https://github.com/olml89/odata-parser)
 [![PHPMD](https://github.com/olml89/odata-parser/actions/workflows/phpmd.yml/badge.svg)](https://github.com/olml89/odata-parser)
 [![PHPStan](https://github.com/olml89/odata-parser/actions/workflows/phpstan.yml/badge.svg)](https://phpstan.org/user-guide/rule-levels)
 
