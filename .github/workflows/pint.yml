@@ -1,4 +1,4 @@
-name: Laravel Pint
+name: PSR-12
 
 on: [push]
 
