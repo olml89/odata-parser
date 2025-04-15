@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Lexer\DataProvider;
+namespace Tests\Integration\Lexer\DataProvider;
 
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\Token;
