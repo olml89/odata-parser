@@ -9,11 +9,6 @@ namespace olml89\ODataParser\Lexer\Keyword;
  */
 trait IsNotChar
 {
-    public function value(): string
-    {
-        return $this->value;
-    }
-
     public function length(): int
     {
         return mb_strlen($this->value);

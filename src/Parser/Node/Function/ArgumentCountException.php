@@ -14,7 +14,7 @@ final class ArgumentCountException extends ParserException
         parent::__construct(
             sprintf(
                 'Function %s needs %s arguments, %s provided',
-                $functionName->value(),
+                $functionName->value,
                 $providedArgumentsCount,
                 $neededArgumentsCount,
             ),
