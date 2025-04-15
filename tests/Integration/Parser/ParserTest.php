@@ -6,7 +6,16 @@ namespace Tests\Integration\Parser;
 
 use olml89\ODataParser\Lexer\Char;
 use olml89\ODataParser\Lexer\Keyword\IsNotChar;
+use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 use olml89\ODataParser\Lexer\Lexer;
+use olml89\ODataParser\Lexer\Scanner\IdentifierScanner;
+use olml89\ODataParser\Lexer\Scanner\IsScanner;
+use olml89\ODataParser\Lexer\Scanner\KeywordScanner;
+use olml89\ODataParser\Lexer\Scanner\NumericScanner;
+use olml89\ODataParser\Lexer\Scanner\ScannerPipeline;
+use olml89\ODataParser\Lexer\Scanner\SpecialCharScanner;
+use olml89\ODataParser\Lexer\Scanner\StringScanner;
+use olml89\ODataParser\Lexer\Source;
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
@@ -45,6 +54,7 @@ use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
 use olml89\ODataParser\Parser\Node\Value\Value;
 use olml89\ODataParser\Parser\Parser;
+use olml89\ODataParser\Parser\TokenManager;
 use olml89\ODataParser\Parser\TokenWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
@@ -69,32 +79,42 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[UsesClass(GreaterThan::class)]
 #[UsesClass(GreaterThanOrEqual::class)]
 #[UsesClass(Has::class)]
-#[UsesTrait(HasHighPreference::class)]
-#[UsesTrait(HasLowPreference::class)]
+#[UsesClass(IdentifierScanner::class)]
 #[UsesClass(In::class)]
 #[UsesClass(IntValue::class)]
+#[UsesClass(KeywordScanner::class)]
 #[UsesClass(LessThan::class)]
 #[UsesClass(Literal::class)]
 #[UsesClass(Mul::class)]
 #[UsesClass(Mod::class)]
 #[UsesClass(NotEqual::class)]
 #[UsesClass(NotOperator::class)]
+#[UsesClass(NumericScanner::class)]
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(OrOperator::class)]
 #[UsesClass(Property::class)]
+#[UsesClass(ScannerPipeline::class)]
+#[UsesClass(Source::class)]
+#[UsesClass(SpecialChar::class)]
+#[UsesClass(SpecialCharScanner::class)]
+#[UsesClass(StringScanner::class)]
 #[UsesClass(StringValue::class)]
 #[UsesClass(StartsWith::class)]
 #[UsesClass(Sub::class)]
 #[UsesClass(Substring::class)]
 #[UsesClass(ToLower::class)]
+#[UsesClass(TokenManager::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(TokenWrapper::class)]
 #[UsesClass(UnexpectedTokenException::class)]
 #[UsesClass(Value::class)]
 #[UsesClass(ValueToken::class)]
 #[UsesClass(UnaryFunction::class)]
+#[UsesTrait(HasHighPreference::class)]
+#[UsesTrait(HasLowPreference::class)]
 #[UsesTrait(IsArithmetic::class)]
 #[UsesTrait(IsNotChar::class)]
+#[UsesTrait(IsScanner::class)]
 final class ParserTest extends TestCase
 {
     #[DataProviderExternal(SintacticallyInvalidInputAndParseExpressionProvider::class, 'provide')]

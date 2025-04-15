@@ -9,7 +9,6 @@ use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Exception\OutOfBoundsException;
-use olml89\ODataParser\Parser\Exception\ParserException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\Node\Function\ArgumentCountException;
 use olml89\ODataParser\Parser\Node\Function\Concat;
@@ -26,7 +25,6 @@ use olml89\ODataParser\Parser\Node\Function\Trim;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Add;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\ArithmeticNode;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Div;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\DivBy;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Minus;
@@ -48,63 +46,26 @@ use olml89\ODataParser\Parser\Node\Property;
 use olml89\ODataParser\Parser\Node\Value\CastingException;
 use olml89\ODataParser\Parser\Node\Value\Value;
 
-final class Parser
+final readonly class Parser
 {
-    /**
-     * @var Token[]
-     */
-    private readonly array $tokens;
-
-    private int $position = 0;
+    private TokenManager $tokens;
 
     public function __construct(Token ...$tokens)
     {
-        $this->tokens = $tokens;
-    }
-
-    private function count(): int
-    {
-        return count($this->tokens);
-    }
-
-    private function eof(): bool
-    {
-        return $this->count() === 0 || $this->position >= $this->count() - 1;
-    }
-
-    private function advance(): void
-    {
-        if ($this->eof()) {
-            return;
-        }
-
-        ++$this->position;
+        $this->tokens = new TokenManager(...$tokens);
     }
 
     /**
      * @throws OutOfBoundsException
-     */
-    private function peek(): TokenWrapper
-    {
-        $token = $this->tokens[$this->position] ?? null;
-
-        if (is_null($token)) {
-            throw new OutOfBoundsException($this->position, $this->count());
-        }
-
-        return new TokenWrapper(
-            token: $token,
-            advanceTokenPosition: fn () => $this->advance(),
-        );
-    }
-
-    /**
-     * @throws ParserException
+     * @throws ArgumentCountException
+     * @throws UnexpectedTokenException
      * @throws CastingException
      */
-    public function parse(): Node
+    public function parse(): ?Node
     {
-        $this->position = 0;
+        if ($this->tokens->isEmpty()) {
+            return null;
+        }
 
         return $this->parseOr();
     }
@@ -129,7 +90,7 @@ final class Parser
     {
         $node = $this->parseAnd();
 
-        while ($this->peek()->consume(TokenKind::Or)) {
+        while ($this->tokens->peek()->consume(TokenKind::Or)) {
             $right = $this->parseAnd();
             $node = new OrOperator($node, $right);
         }
@@ -147,7 +108,7 @@ final class Parser
     {
         $node = $this->parseComparison();
 
-        while ($this->peek()->consume(TokenKind::And)) {
+        while ($this->tokens->peek()->consume(TokenKind::And)) {
             $right = $this->parseComparison();
             $node = new AndOperator($node, $right);
         }
@@ -165,51 +126,51 @@ final class Parser
     {
         $left = $this->parseArithmetic();
 
-        if ($left instanceof Property && $this->peek()->consume(TokenKind::In)) {
-            $this->peek()->expect(TokenKind::OpenParen);
+        if ($left instanceof Property && $this->tokens->peek()->consume(TokenKind::In)) {
+            $this->tokens->peek()->expect(TokenKind::OpenParen);
             $values = [];
 
-            while (!$this->peek()->is(TokenKind::CloseParen)) {
+            while (!$this->tokens->peek()->is(TokenKind::CloseParen)) {
                 $expression = $this->parseArithmetic();
 
                 if ($expression instanceof Literal) {
                     $values[] = $expression;
                 }
 
-                $this->peek()->consume(TokenKind::Comma);
+                $this->tokens->peek()->consume(TokenKind::Comma);
             }
 
-            $this->peek()->expect(TokenKind::CloseParen);
+            $this->tokens->peek()->expect(TokenKind::CloseParen);
 
             return new In($left, ...$values);
         }
 
         $comparison = match (true) {
-            $this->peek()->consume(TokenKind::Equal) => new Equal(
+            $this->tokens->peek()->consume(TokenKind::Equal) => new Equal(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::NotEqual) => new NotEqual(
+            $this->tokens->peek()->consume(TokenKind::NotEqual) => new NotEqual(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::LessThan) => new LessThan(
+            $this->tokens->peek()->consume(TokenKind::LessThan) => new LessThan(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::LessThanOrEqual) => new LessThanOrEqual(
+            $this->tokens->peek()->consume(TokenKind::LessThanOrEqual) => new LessThanOrEqual(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::GreaterThan) => new GreaterThan(
+            $this->tokens->peek()->consume(TokenKind::GreaterThan) => new GreaterThan(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::GreaterThanOrEqual) => new GreaterThanOrEqual(
+            $this->tokens->peek()->consume(TokenKind::GreaterThanOrEqual) => new GreaterThanOrEqual(
                 $left,
                 $this->parseArithmetic(),
             ),
-            $this->peek()->consume(TokenKind::Has) => new Has(
+            $this->tokens->peek()->consume(TokenKind::Has) => new Has(
                 $left,
                 $this->parseArithmetic(),
             ),
@@ -230,39 +191,39 @@ final class Parser
         /**
          * The unary arithmetic takes precedence
          */
-        if ($this->peek()->consume(TokenKind::Minus)) {
+        if ($this->tokens->peek()->consume(TokenKind::Minus)) {
             return new Minus($this->parseNot());
         }
 
         $node = $this->parseNot();
 
-        if ($this->eof()) {
+        if ($this->tokens->eof()) {
             return $node;
         }
 
         while (true) {
             $next = match (true) {
-                $this->peek()->consume(TokenKind::Mul) => fn (Node $right): ArithmeticNode => new Mul(
+                $this->tokens->peek()->consume(TokenKind::Mul) => fn (Node $right): Mul => new Mul(
                     $node,
                     $right
                 ),
-                $this->peek()->consume(TokenKind::Div) => fn (Node $right): ArithmeticNode => new Div(
+                $this->tokens->peek()->consume(TokenKind::Div) => fn (Node $right): Div => new Div(
                     $node,
                     $right
                 ),
-                $this->peek()->consume(TokenKind::DivBy) => fn (Node $right): ArithmeticNode => new DivBy(
+                $this->tokens->peek()->consume(TokenKind::DivBy) => fn (Node $right): DivBy => new DivBy(
                     $node,
                     $right
                 ),
-                $this->peek()->consume(TokenKind::Mod) => fn (Node $right): ArithmeticNode => new Mod(
+                $this->tokens->peek()->consume(TokenKind::Mod) => fn (Node $right): Mod => new Mod(
                     $node,
                     $right
                 ),
-                $this->peek()->consume(TokenKind::Add) => fn (Node $right): ArithmeticNode => new Add(
+                $this->tokens->peek()->consume(TokenKind::Add) => fn (Node $right): Add => new Add(
                     $node,
                     $right
                 ),
-                $this->peek()->consume(TokenKind::Sub) => fn (Node $right): ArithmeticNode => new Sub(
+                $this->tokens->peek()->consume(TokenKind::Sub) => fn (Node $right): Sub => new Sub(
                     $node,
                     $right
                 ),
@@ -288,7 +249,7 @@ final class Parser
      */
     private function parseNot(): Node
     {
-        if ($this->peek()->consume(TokenKind::Not)) {
+        if ($this->tokens->peek()->consume(TokenKind::Not)) {
             $operand = $this->parseNot();
 
             return new NotOperator($operand);
@@ -305,27 +266,27 @@ final class Parser
      */
     private function parsePrimary(): Node
     {
-        $peek = $this->peek();
+        $peek = $this->tokens->peek();
 
         if ($peek->consume(TokenKind::OpenParen)) {
             $subExpression = $this->parseOr();
-            $this->peek()->expect(TokenKind::CloseParen);
+            $this->tokens->peek()->expect(TokenKind::CloseParen);
 
             return $subExpression;
         }
 
         if ($peek->token instanceof ValueToken && $peek->consume(TokenKind::Function)) {
             $name = FunctionName::from($peek->token->value);
-            $this->peek()->expect(TokenKind::OpenParen);
+            $this->tokens->peek()->expect(TokenKind::OpenParen);
             $arguments = [];
 
-            if (!$this->peek()->is(TokenKind::CloseParen)) {
+            if (!$this->tokens->peek()->is(TokenKind::CloseParen)) {
                 do {
                     $arguments[] = $this->parseOr();
-                } while ($this->peek()->consume(TokenKind::Comma));
+                } while ($this->tokens->peek()->consume(TokenKind::Comma));
             }
 
-            $this->peek()->expect(TokenKind::CloseParen);
+            $this->tokens->peek()->expect(TokenKind::CloseParen);
 
             /** @var Property $property */
             $property = array_shift($arguments);
@@ -354,6 +315,6 @@ final class Parser
             default                                             => null,
         };
 
-        return $primary ?? throw UnexpectedTokenException::position($peek->token, $this->position);
+        return $primary ?? throw UnexpectedTokenException::position($peek->token, $peek->position);
     }
 }

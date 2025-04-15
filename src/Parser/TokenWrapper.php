@@ -13,6 +13,7 @@ final readonly class TokenWrapper
 {
     public function __construct(
         public Token $token,
+        public int $position,
         private Closure $advanceTokenPosition,
     ) {
     }

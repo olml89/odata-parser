@@ -23,6 +23,7 @@ use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
 use olml89\ODataParser\Parser\Node\Value\Value;
 use olml89\ODataParser\Parser\Parser;
+use olml89\ODataParser\Parser\TokenManager;
 use olml89\ODataParser\Parser\TokenWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
@@ -45,6 +46,7 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(Literal::class)]
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(Property::class)]
+#[UsesClass(TokenManager::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(TokenWrapper::class)]
 #[UsesClass(UnaryFunction::class)]
@@ -55,13 +57,11 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(OutOfBoundsException::class)]
 final class ParserTest extends TestCase
 {
-    public function testItDoesNotAllowEmptyTokens(): void
+    public function testItParsesEmptyTokensAsNull(): void
     {
-        $this->expectExceptionObject(
-            new OutOfBoundsException(position: 0, count: 0),
-        );
+        $parser = new Parser();
 
-        new Parser()->parse();
+        $this->assertNull($parser->parse());
     }
 
     public function testItDoesNotAllowInvalidTokens(): void
@@ -80,7 +80,7 @@ final class ParserTest extends TestCase
     #[DataProviderExternal(LogicalProvider::class, 'provide')]
     #[DataProviderExternal(FunctionProvider::class, 'provide')]
     #[DataProviderExternal(PrimaryProvider::class, 'provide')]
-    public function testItParsesTokens(Node $expectedNode, Token ...$tokens): void
+    public function testItParsesSimpleTokens(Node $expectedNode, Token ...$tokens): void
     {
         $parser = new Parser(...$tokens);
 

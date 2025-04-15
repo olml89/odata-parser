@@ -25,7 +25,7 @@ final class TokenWrapperTest extends TestCase
     {
         $advanceTokenPosition = fn () => $this->advanced = true;
 
-        return new TokenWrapper($token, $advanceTokenPosition);
+        return new TokenWrapper(token: $token, position: 0, advanceTokenPosition: $advanceTokenPosition);
     }
 
     public function testIs(): void
