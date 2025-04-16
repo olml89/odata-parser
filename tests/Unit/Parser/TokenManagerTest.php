@@ -6,7 +6,7 @@ namespace Tests\Unit\Parser;
 
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\TokenKind;
-use olml89\ODataParser\Parser\Exception\OutOfBoundsException;
+use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\TokenManager;
 use olml89\ODataParser\Parser\TokenWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(TokenManager::class)]
 #[UsesClass(TokenWrapper::class)]
 #[UsesClass(OperatorToken::class)]
-#[UsesClass(OutOfBoundsException::class)]
+#[UsesClass(TokenOutOfBoundsException::class)]
 final class TokenManagerTest extends TestCase
 {
     public function testCount(): void
@@ -63,7 +63,7 @@ final class TokenManagerTest extends TestCase
         $this->assertEquals($token, $manager->peek()->token);
 
         $this->expectExceptionObject(
-            new OutOfBoundsException(position: 0, count: 0),
+            new TokenOutOfBoundsException(position: 0, count: 0),
         );
 
         $emptyManager->peek();

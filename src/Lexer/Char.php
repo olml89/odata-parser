@@ -4,20 +4,21 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer;
 
+use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 use Stringable;
 
 final readonly class Char implements Stringable
 {
     /**
-     * @throws LexerException
+     * @throws InvalidCharLengthException
      */
     public function __construct(
         public string $char,
         public int $position,
     ) {
         if (mb_strlen($this->char) > 1) {
-            throw LexerException::invalidCharacterLength($this->char);
+            throw new InvalidCharLengthException($this->char);
         }
     }
 

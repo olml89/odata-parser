@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Tests\Unit\Lexer;
 
 use olml89\ODataParser\Lexer\Char;
+use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
-use olml89\ODataParser\Lexer\LexerException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Char::class)]
-#[UsesClass(LexerException::class)]
+#[UsesClass(InvalidCharLengthException::class)]
 final class CharTest extends TestCase
 {
     public function testItDoesNotAllowInvalidLengthStrings(): void
@@ -20,7 +20,7 @@ final class CharTest extends TestCase
         $invalidString = 'abc';
 
         $this->expectExceptionObject(
-            LexerException::invalidCharacterLength($invalidString),
+            new InvalidCharLengthException($invalidString),
         );
 
         new Char($invalidString, position: 0);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace olml89\ODataParser\Parser;
 
 use olml89\ODataParser\Lexer\Token\Token;
-use olml89\ODataParser\Parser\Exception\OutOfBoundsException;
+use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 
 final class TokenManager
 {
@@ -46,14 +46,14 @@ final class TokenManager
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      */
     public function peek(): TokenWrapper
     {
         $token = $this->tokens[$this->position] ?? null;
 
         if (is_null($token)) {
-            throw new OutOfBoundsException($this->position, $this->count());
+            throw new TokenOutOfBoundsException($this->position, $this->count());
         }
 
         return new TokenWrapper(

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\Integration\Lexer;
 
 use olml89\ODataParser\Lexer\Char;
+use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
+use olml89\ODataParser\Lexer\Exception\InvalidTokenException;
+use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
 use olml89\ODataParser\Lexer\Keyword\IsNotChar;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 use olml89\ODataParser\Lexer\Lexer;
-use olml89\ODataParser\Lexer\LexerException;
 use olml89\ODataParser\Lexer\Scanner\IdentifierScanner;
 use olml89\ODataParser\Lexer\Scanner\IsScanner;
 use olml89\ODataParser\Lexer\Scanner\KeywordScanner;
@@ -37,8 +39,9 @@ use Tests\Integration\Lexer\DataProvider\SpecialCharProvider;
 
 #[CoversClass(Lexer::class)]
 #[UsesClass(Char::class)]
-#[UsesClass(LexerException::class)]
 #[UsesClass(IdentifierScanner::class)]
+#[UsesClass(InvalidCharLengthException::class)]
+#[UsesClass(InvalidTokenException::class)]
 #[UsesClass(KeywordScanner::class)]
 #[UsesClass(NumericScanner::class)]
 #[UsesClass(OperatorToken::class)]
@@ -48,6 +51,7 @@ use Tests\Integration\Lexer\DataProvider\SpecialCharProvider;
 #[UsesClass(SpecialCharScanner::class)]
 #[UsesClass(StringScanner::class)]
 #[UsesClass(TokenKind::class)]
+#[UsesClass(UnterminatedStringException::class)]
 #[UsesClass(ValueToken::class)]
 #[UsesTrait(IsScanner::class)]
 #[UsesTrait(IsNotChar::class)]
@@ -67,12 +71,12 @@ final class LexerTest extends TestCase
         $this->assertEmpty($lexer->tokenize());
     }
 
-    public function testItDoesNotAllowInvalidInputs(): void
+    public function testItThrowsInvalidTokenExceptionOnInvalidInputs(): void
     {
         $lexer = new Lexer('#');
 
         $this->expectExceptionObject(
-            LexerException::unknownToken(position: 0),
+            new InvalidTokenException(position: 0),
         );
 
         $lexer->tokenize();
@@ -100,12 +104,12 @@ final class LexerTest extends TestCase
     }
 
     #[DataProvider('provideUnterminatedString')]
-    public function testItThrowsLexerExceptionOnUnterminatedStrings(string $unterminatedString): void
+    public function testItThrowsUnterminatedStringExceptionOnUnterminatedStrings(string $unterminatedString): void
     {
         $lexer = new Lexer($unterminatedString);
 
         $this->expectExceptionObject(
-            LexerException::unterminatedString(),
+            new UnterminatedStringException(),
         );
 
         $lexer->tokenize();

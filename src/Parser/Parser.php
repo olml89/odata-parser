@@ -8,7 +8,7 @@ use olml89\ODataParser\Lexer\Keyword\FunctionName;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
-use olml89\ODataParser\Parser\Exception\OutOfBoundsException;
+use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\Node\Function\ArgumentCountException;
 use olml89\ODataParser\Parser\Node\Function\Concat;
@@ -56,7 +56,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -81,7 +81,7 @@ final readonly class Parser
      *                  parseNot()
      *                      parsePrimary() [parentheses, functions, literals]
      *
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -99,7 +99,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -117,7 +117,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -181,7 +181,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -242,7 +242,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException
@@ -259,7 +259,7 @@ final readonly class Parser
     }
 
     /**
-     * @throws OutOfBoundsException
+     * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
      * @throws UnexpectedTokenException
      * @throws CastingException

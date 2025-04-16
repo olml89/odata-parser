@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer\Scanner;
 
-use olml89\ODataParser\Lexer\LexerException;
+use olml89\ODataParser\Lexer\Exception\InvalidTokenException;
+use olml89\ODataParser\Lexer\Exception\LexerException;
 use olml89\ODataParser\Lexer\Source;
 use olml89\ODataParser\Lexer\Token\Token;
 
@@ -58,6 +59,6 @@ final readonly class ScannerPipeline implements Scanner
             }
         }
 
-        throw LexerException::unknownToken($this->source->position);
+        throw new InvalidTokenException($this->source->position);
     }
 }

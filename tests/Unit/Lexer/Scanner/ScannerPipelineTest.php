@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit\Lexer\Scanner;
 
 use olml89\ODataParser\Lexer\Char;
+use olml89\ODataParser\Lexer\Exception\InvalidTokenException;
 use olml89\ODataParser\Lexer\Keyword\ComparisonOperator;
 use olml89\ODataParser\Lexer\Keyword\IsNotChar;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
-use olml89\ODataParser\Lexer\LexerException;
 use olml89\ODataParser\Lexer\Scanner\IdentifierScanner;
 use olml89\ODataParser\Lexer\Scanner\KeywordScanner;
 use olml89\ODataParser\Lexer\Scanner\NumericScanner;
@@ -29,8 +29,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(ScannerPipeline::class)]
 #[UsesClass(Char::class)]
 #[UsesClass(IdentifierScanner::class)]
+#[UsesClass(InvalidTokenException::class)]
 #[UsesClass(KeywordScanner::class)]
-#[UsesClass(LexerException::class)]
 #[UsesClass(NumericScanner::class)]
 #[UsesClass(Source::class)]
 #[UsesClass(SpecialChar::class)]
@@ -65,12 +65,12 @@ final class ScannerPipelineTest extends TestCase
         $this->assertNull($scannerPipeline->scan());
     }
 
-    public function testScanThrowsLexerExceptionIfNoScannerInPipelineReturnsToken(): void
+    public function testScanThrowsInvalidTokenExceptionIfNoScannerInPipelineReturnsToken(): void
     {
         $source = new Source('#');
 
         $this->expectExceptionObject(
-            LexerException::unknownToken($source->position),
+            new InvalidTokenException($source->position),
         );
 
         new ScannerPipeline($source)->scan();

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Parser\Exception;
 
-final class OutOfBoundsException extends ParserException
+final class TokenOutOfBoundsException extends ParserException
 {
     public function __construct(int $position, int $count)
     {

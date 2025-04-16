@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer;
 
+use olml89\ODataParser\Lexer\Exception\LexerException;
 use olml89\ODataParser\Lexer\Scanner\ScannerPipeline;
 use olml89\ODataParser\Lexer\Token\Token;
 

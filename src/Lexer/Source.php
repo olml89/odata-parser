@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer;
 
+use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
+use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
+use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
 use olml89\ODataParser\Lexer\Keyword\Keyword;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 
@@ -42,19 +45,20 @@ final class Source
     }
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
      */
     private function peek(): Char
     {
         if ($this->eof()) {
-            throw LexerException::outOfBounds($this->position, $this->length());
+            throw new CharOutOfBoundsException($this->position, $this->length());
         }
 
         return new Char($this->text[$this->position], $this->position);
     }
 
     /**
-     * @throws LexerException
+     * @throws InvalidCharLengthException
      */
     private function next(): ?Char
     {
@@ -83,7 +87,8 @@ final class Source
     }
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
      */
     public function consumeWhiteSpaces(): void
     {
@@ -93,7 +98,8 @@ final class Source
     }
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
      */
     public function consumeAlpha(): ?string
     {
@@ -111,7 +117,8 @@ final class Source
     }
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
      */
     public function consumeNumeric(): ?string
     {
@@ -132,7 +139,9 @@ final class Source
     }
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
+     * @throws UnterminatedStringException
      */
     public function consumeString(): ?string
     {
@@ -150,7 +159,7 @@ final class Source
         }
 
         if ($this->eof()) {
-            throw LexerException::unterminatedString();
+            throw new UnterminatedStringException();
         }
 
         $string = $this->substring($start);

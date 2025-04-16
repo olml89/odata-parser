@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer\Scanner;
 
-use olml89\ODataParser\Lexer\LexerException;
+use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
+use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 
@@ -13,7 +14,8 @@ final readonly class NumericScanner implements Scanner
     use IsScanner;
 
     /**
-     * @throws LexerException
+     * @throws CharOutOfBoundsException
+     * @throws InvalidCharLengthException
      */
     public function scan(): ?ValueToken
     {

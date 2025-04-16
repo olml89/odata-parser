@@ -7,7 +7,7 @@ namespace Tests\Unit\Parser;
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
-use olml89\ODataParser\Parser\Exception\OutOfBoundsException;
+use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\Node\Function\BinaryFunction;
 use olml89\ODataParser\Parser\Node\Function\UnaryFunction;
@@ -54,7 +54,7 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(UnexpectedTokenException::class)]
 #[UsesClass(Value::class)]
 #[UsesClass(StringValue::class)]
-#[UsesClass(OutOfBoundsException::class)]
+#[UsesClass(TokenOutOfBoundsException::class)]
 final class ParserTest extends TestCase
 {
     public function testItParsesEmptyTokensAsNull(): void
