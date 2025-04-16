@@ -13,6 +13,8 @@ enum SpecialChar: string implements Keyword
     case DoubleQuote = '"';
     case Comma = ',';
     case Dot = '.';
+    case Colon = ':';
+    case Slash = '/';
 
     public function length(): int
     {

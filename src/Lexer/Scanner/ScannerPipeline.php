@@ -59,6 +59,6 @@ final readonly class ScannerPipeline implements Scanner
             }
         }
 
-        throw new InvalidTokenException($this->source->position);
+        throw new InvalidTokenException($this->source->peek());
     }
 }

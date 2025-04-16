@@ -67,7 +67,6 @@ final readonly class OperatorPrecedenceProvider
             'not over parentheses and combined expressions' => [
                 'not((a gt 10 or b lt 5) and c eq 3)',
                 'not (a gt 10 or b lt 5) and c eq 3',
-
             ],
             'expression with nested arithmetical and logical subexpressions, redundant parentheses are removed' => [
                 '((a add 2) mul (b sub 3)) lt 100 and not c eq null',
@@ -80,6 +79,22 @@ final readonly class OperatorPrecedenceProvider
             'has expression with a literal' => [
                 'flags has \'important\'',
                 'flags has \'important\'',
+            ],
+            'any accessing entities' => [
+                'status/any(s: s in (\'processing\', \'accepted\'))',
+                'status/any(s: s in (\'processing\', \'accepted\'))',
+            ],
+            'any accessing entity properties' => [
+                'orders/any(o: o/amount gt 100 and o/status eq \'open\')',
+                'orders/any(o: o/amount gt 100 and o/status eq \'open\')',
+            ],
+            'all accessing entities' => [
+                'status/all(s: s in (\'processing\', \'accepted\'))',
+                'status/all(s: s in (\'processing\', \'accepted\'))',
+            ],
+            'all accessing entity properties' => [
+                'orders/all(o: o/amount gt 100 and o/status eq \'open\')',
+                'orders/all(o: o/amount gt 100 and o/status eq \'open\')',
             ],
             'combination of functions, parentheses, not, or, and: and takes precedence, parentheses added' => [
                 'not startswith(name, \'J\') or endswith(name, \'Smith\') and age ge 18',

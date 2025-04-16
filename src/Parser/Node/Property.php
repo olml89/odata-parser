@@ -8,11 +8,14 @@ final readonly class Property implements Node
 {
     public function __construct(
         public string $name,
+        public ?Property $subProperty = null,
     ) {
     }
 
     public function __toString(): string
     {
-        return $this->name;
+        return is_null($this->subProperty)
+            ? $this->name
+            : sprintf('%s/%s', $this->name, $this->subProperty);
     }
 }

@@ -28,7 +28,7 @@ Supposing we have a valid OData string, it will be converted into a syntacticall
 logical structure of the query:
 
 ```php
-$queryString = "$filter=(name eq 'John Smith' or startswith(name, 'P')) and age gt 18"
+$queryString = '$filter=(name eq \'John Smith\' or startswith(name, \'P\')) and age gt 18'
 
 $query = \olml89\ODataParser\ODataUriParser::parse($queryString);
 ```
@@ -67,6 +67,9 @@ The following operators, functions and literals are supported:
 | ge             | Greater than or equal | price gte 100                                                   |
 | has            | Has flags             | cities has 'Berlin'                                             |
 | in             | Is a member of        | status in ('archived', 'processed')                             |
+| **Collection** |                       |                                                                 |
+| any            | At least one match    | orders/any(o: o/amount gt 100)                                  |
+| all            | All must match        | orders/all(o: o/status eq 'open')                               |
 | **Logical**    |                       |                                                                 |
 | not            | Logical not (!)       | not endswith(name, 'Smith')                                     |
 | and            | Logical and (&&)      | price ge 10 and price le 99                                     |
@@ -118,7 +121,7 @@ For example, `and` has a higher precedence than `or` (is evaluated earlier), but
 earlier instead using properly the parentheses:
 
 ```php
-'(name eq 'John Smith' or startswith(name, \'P\')) and age gt 18
+'(name eq \'John Smith\' or startswith(name, \'P\')) and age gt 18
 ```
 
 All the operation names are normalized to lower case before being processed. That means the operator and function names are

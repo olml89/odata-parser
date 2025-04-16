@@ -5,16 +5,27 @@ declare(strict_types=1);
 namespace Tests\Unit\Lexer;
 
 use olml89\ODataParser\Lexer\Char;
+use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
+use olml89\ODataParser\Lexer\Keyword\ArithmeticOperator;
+use olml89\ODataParser\Lexer\Keyword\CollectionOperator;
 use olml89\ODataParser\Lexer\Keyword\ComparisonOperator;
+use olml89\ODataParser\Lexer\Keyword\FunctionName;
 use olml89\ODataParser\Lexer\Keyword\IsNotChar;
+use olml89\ODataParser\Lexer\Keyword\Keyword;
+use olml89\ODataParser\Lexer\Keyword\LogicalOperator;
+use olml89\ODataParser\Lexer\Keyword\SpecialChar;
+use olml89\ODataParser\Lexer\Keyword\TypeConstant;
 use olml89\ODataParser\Lexer\Source;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Source::class)]
 #[UsesClass(Char::class)]
+#[UsesClass(CharOutOfBoundsException::class)]
+#[UsesClass(SpecialChar::class)]
 #[UsesTrait(IsNotChar::class)]
 final class SourceTest extends TestCase
 {
@@ -30,13 +41,114 @@ final class SourceTest extends TestCase
         $this->assertFalse(new Source(' ')->eof());
     }
 
-    public function testFind(): void
+    public function testPeek(): void
     {
-        $findable = ComparisonOperator::eq;
-        $source = new Source($findable->value);
+        $source = new Source('a');
 
-        $this->assertNull($source->find(ComparisonOperator::ne));
-        $this->assertEquals($findable, $source->find(ComparisonOperator::eq));
+        $this->assertEquals('a', (string) $source->peek());
+        $this->assertEquals(0, $source->peek()->position);
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: Keyword, 2: Keyword}>
+     */
+    public static function provideInputAndFoundKeyword(): array
+    {
+        return [
+            'keyword followed by whitespace' => [
+                'or ',
+                LogicalOperator::or,
+                LogicalOperator::or,
+            ],
+            'keyword followed by open parentheses' => [
+                'and(',
+                LogicalOperator::and,
+                LogicalOperator::and,
+            ],
+            'keyword followed by end of string' => [
+                'contains',
+                FunctionName::contains,
+                FunctionName::contains,
+            ],
+            'special char followed by another special char' => [
+                ')(',
+                SpecialChar::CloseParen,
+                SpecialChar::CloseParen,
+            ],
+            'special char followed by alpha char' => [
+                ')a',
+                SpecialChar::CloseParen,
+                SpecialChar::CloseParen,
+            ],
+            'special char followed by number' => [
+                ')4',
+                SpecialChar::CloseParen,
+                SpecialChar::CloseParen,
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: Keyword, 2: null}>
+     */
+    public static function provideInputAndNull(): array
+    {
+        return [
+            'keyword followed by close parentheses' => [
+                'not)',
+                LogicalOperator::not,
+                null,
+            ],
+            'keyword followed by single quote' => [
+                'eq\'',
+                ComparisonOperator::eq,
+                null,
+            ],
+            'keyword followed by double quote' => [
+                'ne"',
+                ComparisonOperator::ne,
+                null,
+            ],
+            'keyword followed by comma' => [
+                'add,',
+                ArithmeticOperator::add,
+                null,
+            ],
+            'keyword followed by dot' => [
+                'toupper.',
+                FunctionName::toupper,
+                null,
+            ],
+            'keyword followed by colon' => [
+                'true:',
+                TypeConstant::true,
+                null,
+            ],
+            'keyword followed by slash' => [
+                'false/',
+                TypeConstant::false,
+                null,
+            ],
+            'keyword followed by any other alpha char' => [
+                'nulled',
+                TypeConstant::null,
+                null,
+            ],
+            'keyword followed by number' => [
+                'any3',
+                CollectionOperator::any,
+                null,
+            ],
+        ];
+    }
+
+    #[DataProvider('provideInputAndFoundKeyword')]
+    #[DataProvider('provideInputAndNull')]
+    public function testFind(string $input, Keyword $find, ?Keyword $found): void
+    {
+        $source = new Source($input);
+
+        $this->assertEquals($found, $source->find($find));
     }
 
     public function testConsumeWhiteSpaces(): void
@@ -46,7 +158,14 @@ final class SourceTest extends TestCase
 
         $source->consumeWhiteSpaces();
 
-        $this->assertEquals(mb_strlen($whiteSpaces), $source->position);
+        $this->expectExceptionObject(
+            new CharOutOfBoundsException(
+                mb_strlen($whiteSpaces),
+                mb_strlen($whiteSpaces),
+            ),
+        );
+
+        $source->peek();
     }
 
     public function testConsumeAlpha(): void
@@ -56,8 +175,15 @@ final class SourceTest extends TestCase
         $sourceWithAlpha = new Source($alpha . '3.1416');
 
         $this->assertNull($sourceWithoutAlpha->consumeAlpha());
-        $this->assertEquals($alpha, $sourceWithAlpha->consumeAlpha());
-        $this->assertEquals(mb_strlen($alpha), $sourceWithAlpha->position);
+
+        $this->assertEquals(
+            $alpha,
+            $sourceWithAlpha->consumeAlpha(),
+        );
+        $this->assertEquals(
+            new Char('3', 5),
+            $sourceWithAlpha->peek(),
+        );
     }
 
     public function testConsumeNumeric(): void
@@ -69,10 +195,24 @@ final class SourceTest extends TestCase
         $sourceWithFloat = new Source($float . 'abcde');
 
         $this->assertNull($sourceWithoutNumeric->consumeNumeric());
-        $this->assertEquals($integer, $sourceWithInteger->consumeNumeric());
-        $this->assertEquals(mb_strlen($integer), $sourceWithInteger->position);
-        $this->assertEquals($float, $sourceWithFloat->consumeNumeric());
-        $this->assertEquals(mb_strlen($float), $sourceWithFloat->position);
+
+        $this->assertEquals(
+            $integer,
+            $sourceWithInteger->consumeNumeric(),
+        );
+        $this->assertEquals(
+            new Char('a', 2),
+            $sourceWithInteger->peek(),
+        );
+
+        $this->assertEquals(
+            $float,
+            $sourceWithFloat->consumeNumeric(),
+        );
+        $this->assertEquals(
+            new Char('a', 6),
+            $sourceWithFloat->peek(),
+        );
     }
 
     public function testConsumeString(): void
@@ -83,9 +223,23 @@ final class SourceTest extends TestCase
         $sourceWithStringBetweenDoubleQuotes = new Source('"' . $string .'"' . 'xyz');
 
         $this->assertNull($sourceWithoutString->consumeString());
-        $this->assertEquals($string, $sourceWithStringBetweenSingleQuotes->consumeString());
-        $this->assertEquals(mb_strlen('\''. $string . '\''), $sourceWithStringBetweenSingleQuotes->position);
-        $this->assertEquals($string, $sourceWithStringBetweenDoubleQuotes->consumeString());
-        $this->assertEquals(mb_strlen('"' . $string . '"'), $sourceWithStringBetweenDoubleQuotes->position);
+
+        $this->assertEquals(
+            $string,
+            $sourceWithStringBetweenSingleQuotes->consumeString(),
+        );
+        $this->assertEquals(
+            new Char('x', 7),
+            $sourceWithStringBetweenSingleQuotes->peek(),
+        );
+
+        $this->assertEquals(
+            $string,
+            $sourceWithStringBetweenDoubleQuotes->consumeString(),
+        );
+        $this->assertEquals(
+            new Char('x', 7),
+            $sourceWithStringBetweenDoubleQuotes->peek(),
+        );
     }
 }

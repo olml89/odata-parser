@@ -53,7 +53,7 @@ final class TokenWrapperTest extends TestCase
         $token = new OperatorToken(TokenKind::Comma);
         $tokenWrapper = $this->createTokenWrapper($token);
 
-        $tokenWrapper->expect(TokenKind::Comma);
+        $this->assertEquals($tokenWrapper, $tokenWrapper->expect(TokenKind::Comma));
         $this->assertTrue($this->advanced);
 
         $this->expectExceptionObject(

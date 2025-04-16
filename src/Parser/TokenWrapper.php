@@ -37,13 +37,15 @@ final readonly class TokenWrapper
     /**
      * @throws UnexpectedTokenException
      */
-    public function expect(TokenKind $tokenKind): void
+    public function expect(TokenKind $tokenKind): self
     {
         if (!$this->consume($tokenKind)) {
             throw UnexpectedTokenException::wrongTokenKind(
                 $this->token,
-                expectedTokenKind: $tokenKind,
+                expectedTokenKinds: $tokenKind,
             );
         }
+
+        return $this;
     }
 }

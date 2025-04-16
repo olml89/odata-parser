@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace olml89\ODataParser\Lexer\Scanner;
 
 use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
-use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
@@ -16,7 +15,6 @@ final readonly class StringScanner implements Scanner
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      * @throws UnterminatedStringException
      */
     public function scan(): ?ValueToken

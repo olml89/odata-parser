@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Integration\Lexer;
 
 use olml89\ODataParser\Lexer\Char;
-use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Exception\InvalidTokenException;
 use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
 use olml89\ODataParser\Lexer\Keyword\IsNotChar;
@@ -40,7 +39,6 @@ use Tests\Integration\Lexer\DataProvider\SpecialCharProvider;
 #[CoversClass(Lexer::class)]
 #[UsesClass(Char::class)]
 #[UsesClass(IdentifierScanner::class)]
-#[UsesClass(InvalidCharLengthException::class)]
 #[UsesClass(InvalidTokenException::class)]
 #[UsesClass(KeywordScanner::class)]
 #[UsesClass(NumericScanner::class)]
@@ -76,7 +74,7 @@ final class LexerTest extends TestCase
         $lexer = new Lexer('#');
 
         $this->expectExceptionObject(
-            new InvalidTokenException(position: 0),
+            new InvalidTokenException(new Char('#', position: 0)),
         );
 
         $lexer->tokenize();

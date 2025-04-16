@@ -70,7 +70,7 @@ final class ScannerPipelineTest extends TestCase
         $source = new Source('#');
 
         $this->expectExceptionObject(
-            new InvalidTokenException($source->position),
+            new InvalidTokenException(new Char('#', position: 0)),
         );
 
         new ScannerPipeline($source)->scan();

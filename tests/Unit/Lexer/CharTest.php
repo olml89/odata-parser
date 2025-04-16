@@ -5,25 +5,19 @@ declare(strict_types=1);
 namespace Tests\Unit\Lexer;
 
 use olml89\ODataParser\Lexer\Char;
-use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Char::class)]
-#[UsesClass(InvalidCharLengthException::class)]
 final class CharTest extends TestCase
 {
-    public function testItDoesNotAllowInvalidLengthStrings(): void
+    public function testItTakesOnlyFirstCharIfStringIsLongerThan1Char(): void
     {
-        $invalidString = 'abc';
+        $string = 'abc';
+        $char = new Char($string, position: 0);
 
-        $this->expectExceptionObject(
-            new InvalidCharLengthException($invalidString),
-        );
-
-        new Char($invalidString, position: 0);
+        $this->assertEquals('a', (string)$char);
     }
 
     public function testIsDigit(): void

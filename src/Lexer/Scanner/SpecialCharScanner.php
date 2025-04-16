@@ -18,12 +18,16 @@ final readonly class SpecialCharScanner implements Scanner
             SpecialChar::OpenParen,
             SpecialChar::CloseParen,
             SpecialChar::Comma,
+            SpecialChar::Colon,
+            SpecialChar::Slash,
         );
 
         $tokenKind = match ($specialChar) {
             SpecialChar::OpenParen => TokenKind::OpenParen,
             SpecialChar::CloseParen => TokenKind::CloseParen,
             SpecialChar::Comma => TokenKind::Comma,
+            SpecialChar::Colon => TokenKind::Colon,
+            SpecialChar::Slash => TokenKind::Slash,
             default => null,
         };
 

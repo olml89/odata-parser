@@ -31,6 +31,8 @@ use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Minus;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mod;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mul;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Sub;
+use olml89\ODataParser\Parser\Node\Operator\Comparison\All;
+use olml89\ODataParser\Parser\Node\Operator\Comparison\Any;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThan;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThanOrEqual;
@@ -255,7 +257,7 @@ final readonly class Parser
             return new NotOperator($operand);
         }
 
-        return $this->parsePrimary();
+        return $this->parseExpression();
     }
 
     /**
@@ -264,10 +266,13 @@ final readonly class Parser
      * @throws UnexpectedTokenException
      * @throws CastingException
      */
-    private function parsePrimary(): Node
+    private function parseExpression(): Node
     {
         $peek = $this->tokens->peek();
 
+        /**
+         * Subexpressions
+         */
         if ($peek->consume(TokenKind::OpenParen)) {
             $subExpression = $this->parseOr();
             $this->tokens->peek()->expect(TokenKind::CloseParen);
@@ -275,6 +280,9 @@ final readonly class Parser
             return $subExpression;
         }
 
+        /**
+         * Functions
+         */
         if ($peek->token instanceof ValueToken && $peek->consume(TokenKind::Function)) {
             $name = FunctionName::from($peek->token->value);
             $this->tokens->peek()->expect(TokenKind::OpenParen);
@@ -306,6 +314,62 @@ final readonly class Parser
             };
         }
 
+        /**
+         * Collection operators (any, all)
+         */
+        if ($peek->token instanceof ValueToken && $peek->consume(TokenKind::Identifier)) {
+            $property = new Property($peek->token->value);
+
+            if (!$this->tokens->peek()->consume(TokenKind::Slash)) {
+                return $property;
+            }
+
+            $next = $this->tokens->peek();
+
+            /**
+             * Compound properties, which represent $entity->property.
+             *
+             * In OData they are expressed with a slash, for example:
+             * orders/any(o: o/amount gt 100 and o/status eq 'open')
+             */
+            if ($next->token instanceof ValueToken && $next->consume(TokenKind::Identifier)) {
+                return new Property(
+                    $property->name,
+                    new Property($next->token->value),
+                );
+            }
+
+            if (!$next->consume(TokenKind::Any, TokenKind::All)) {
+                throw UnexpectedTokenException::position($next->token, $next->position);
+            }
+
+            $collectionOperatorToken = $next->token;
+            $this->tokens->peek()->expect(TokenKind::OpenParen);
+
+            /** @var ValueToken $variableToken */
+            $variableToken = $this->tokens->peek()->expect(TokenKind::Identifier)->token;
+            $variable = new Property($variableToken->value);
+
+            $this->tokens->peek()->expect(TokenKind::Colon);
+            $predicate = $this->parseOr();
+            $this->tokens->peek()->expect(TokenKind::CloseParen);
+
+            $collectionLambda = match ($collectionOperatorToken->kind) {
+                TokenKind::Any => new Any($property, $variable, $predicate),
+                TokenKind::All => new All($property, $variable, $predicate),
+                default => null,
+            };
+
+            return $collectionLambda ?? throw UnexpectedTokenException::wrongTokenKind(
+                $collectionOperatorToken,
+                TokenKind::Any,
+                TokenKind::All,
+            );
+        }
+
+        /**
+         * Primaries (properties, values)
+         */
         $primary = !($peek->token instanceof ValueToken) ? null : match (true) {
             $peek->consume(TokenKind::Identifier),  => new Property($peek->token->value),
             $peek->consume(TokenKind::Null),

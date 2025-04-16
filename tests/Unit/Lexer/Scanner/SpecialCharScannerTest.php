@@ -69,6 +69,12 @@ final class SpecialCharScannerTest extends TestCase
             'comma' => [
                 SpecialChar::Comma,
             ],
+            'colon' => [
+                SpecialChar::Colon,
+            ],
+            'slash' => [
+                SpecialChar::Slash,
+            ],
         ];
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer;
 
-use olml89\ODataParser\Lexer\Exception\InvalidCharLengthException;
 use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
 use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
 use olml89\ODataParser\Lexer\Keyword\Keyword;
@@ -12,7 +11,7 @@ use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 
 final class Source
 {
-    private(set) public int $position = 0;
+    private int $position = 0;
 
     public function __construct(
         private readonly string $text,
@@ -39,33 +38,24 @@ final class Source
         $this->position += $positions;
     }
 
-    private function substring(int $start): string
+    private function substring(int $start, int $length): string
     {
-        return mb_substr($this->text, start: $start, length: $this->position - $start);
+        return mb_substr($this->text, start: $start, length: $length);
+    }
+
+    private function charAt(int $position): ?Char
+    {
+        $char = $this->text[$position] ?? null;
+
+        return is_null($char) ? null : new Char($char, $position);
     }
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      */
-    private function peek(): Char
+    public function peek(): Char
     {
-        if ($this->eof()) {
-            throw new CharOutOfBoundsException($this->position, $this->length());
-        }
-
-        return new Char($this->text[$this->position], $this->position);
-    }
-
-    /**
-     * @throws InvalidCharLengthException
-     */
-    private function next(): ?Char
-    {
-        $nextPosition = $this->position + 1;
-        $char = $this->text[$nextPosition] ?? null;
-
-        return is_null($char) ? null : new Char($char, $nextPosition);
+        return $this->charAt($this->position) ?? throw new CharOutOfBoundsException($this->position, $this->length());
     }
 
     public function find(Keyword ...$keywords): ?Keyword
@@ -73,9 +63,29 @@ final class Source
         $found = array_find(
             $keywords,
             function (Keyword $keyword): bool {
-                $match = mb_substr($this->text, start: $this->position, length: mb_strlen($keyword->value));
+                $currentSubstring = $this->substring(start: $this->position, length: mb_strlen($keyword->value));
 
-                return mb_strtolower($match) === mb_strtolower($keyword->value);
+                if (mb_strtolower($currentSubstring) !== mb_strtolower($keyword->value)) {
+                    return false;
+                }
+
+                /**
+                 * If it is a special char, we don't check anything else. A match is a match. We only have to check
+                 * if the keyword can be part of something else with keywords that are not a special char, for ex.,
+                 * operators, functions...
+                 */
+                if ($keyword instanceof SpecialChar) {
+                    return true;
+                }
+
+                /**
+                 * If there's no char left after the match, we have reached the end of the string, so technically we
+                 * have found a valid keyword, although it is probably syntactically invalid unless it is close
+                 * parentheses. But that's a problem for the parser.
+                 */
+                return $this
+                    ->charAt($this->position + mb_strlen($keyword->value))
+                    ?->equals(SpecialChar::WhiteSpace, SpecialChar::OpenParen) ?? true;
             },
         );
 
@@ -88,7 +98,6 @@ final class Source
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      */
     public function consumeWhiteSpaces(): void
     {
@@ -99,7 +108,6 @@ final class Source
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      */
     public function consumeAlpha(): ?string
     {
@@ -113,17 +121,16 @@ final class Source
             $this->advance();
         }
 
-        return $this->substring($start);
+        return $this->substring(start: $start, length: $this->position - $start);
     }
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      */
     public function consumeNumeric(): ?string
     {
         $char = $this->peek();
-        $nextChar = $this->next();
+        $nextChar = $this->charAt($this->position + 1);
 
         if (!$char->isDigit() && !($char->equals(SpecialChar::Dot) && $nextChar?->isDigit())) {
             return null;
@@ -135,12 +142,11 @@ final class Source
             $this->advance();
         }
 
-        return $this->substring($start);
+        return $this->substring(start: $start, length: $this->position - $start);
     }
 
     /**
      * @throws CharOutOfBoundsException
-     * @throws InvalidCharLengthException
      * @throws UnterminatedStringException
      */
     public function consumeString(): ?string
@@ -162,7 +168,7 @@ final class Source
             throw new UnterminatedStringException();
         }
 
-        $string = $this->substring($start);
+        $string = $this->substring(start: $start, length: $this->position - $start);
 
         // Consume closing delimiter
         $this->advance();

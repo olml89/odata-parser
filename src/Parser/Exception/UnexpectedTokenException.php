@@ -21,13 +21,18 @@ final class UnexpectedTokenException extends ParserException
         );
     }
 
-    public static function wrongTokenKind(Token $token, TokenKind $expectedTokenKind): self
+    public static function wrongTokenKind(Token $token, TokenKind ...$expectedTokenKinds): self
     {
         return new self(
             sprintf(
                 'Unexpected token: %s, instead of: %s',
                 $token->kind->name,
-                $expectedTokenKind->name,
+                count($expectedTokenKinds) === 1
+                    ? current($expectedTokenKinds)->name
+                    : implode(
+                        ', ',
+                        array_map(fn (TokenKind $kind): string => $kind->name, $expectedTokenKinds),
+                    ),
             ),
         );
     }

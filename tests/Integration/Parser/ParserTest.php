@@ -38,6 +38,9 @@ use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mod;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mul;
 use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Sub;
 use olml89\ODataParser\Parser\Node\Operator\BinaryOperator;
+use olml89\ODataParser\Parser\Node\Operator\CollectionLambdaOperator;
+use olml89\ODataParser\Parser\Node\Operator\Comparison\All;
+use olml89\ODataParser\Parser\Node\Operator\Comparison\Any;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThan;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThanOrEqual;
@@ -67,11 +70,14 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[CoversClass(Lexer::class)]
 #[CoversClass(Parser::class)]
 #[UsesClass(Add::class)]
+#[UsesClass(All::class)]
+#[UsesClass(Any::class)]
 #[UsesClass(AndOperator::class)]
 #[UsesClass(ArgumentCountException::class)]
 #[UsesClass(BinaryFunction::class)]
 #[UsesClass(BinaryOperator::class)]
 #[UsesClass(BooleanValue::class)]
+#[UsesClass(CollectionLambdaOperator::class)]
 #[UsesClass(Char::class)]
 #[UsesClass(Div::class)]
 #[UsesClass(EndsWith::class)]

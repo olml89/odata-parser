@@ -67,6 +67,8 @@ enum TokenKind
     case SingleQuote;
     case Comma;
     case Dot;
+    case Colon;
+    case Slash;
 
     public function is(TokenKind ...$tokenKinds): bool
     {

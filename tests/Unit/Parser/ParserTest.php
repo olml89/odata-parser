@@ -14,6 +14,7 @@ use olml89\ODataParser\Parser\Node\Function\UnaryFunction;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
 use olml89\ODataParser\Parser\Node\Operator\BinaryOperator;
+use olml89\ODataParser\Parser\Node\Operator\CollectionLambdaOperator;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\In;
 use olml89\ODataParser\Parser\Node\Operator\UnaryOperator;
 use olml89\ODataParser\Parser\Node\Property;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Parser\DataProvider\ArithmeticProvider;
+use Tests\Unit\Parser\DataProvider\CollectionProvider;
 use Tests\Unit\Parser\DataProvider\ComparisonProvider;
 use Tests\Unit\Parser\DataProvider\FunctionProvider;
 use Tests\Unit\Parser\DataProvider\LogicalProvider;
@@ -40,6 +42,7 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(BinaryFunction::class)]
 #[UsesClass(BinaryOperator::class)]
 #[UsesClass(BooleanValue::class)]
+#[UsesClass(CollectionLambdaOperator::class)]
 #[UsesClass(FloatValue::class)]
 #[UsesClass(In::class)]
 #[UsesClass(IntValue::class)]
@@ -78,6 +81,7 @@ final class ParserTest extends TestCase
     #[DataProviderExternal(ComparisonProvider::class, 'provide')]
     #[DataProviderExternal(ArithmeticProvider::class, 'provide')]
     #[DataProviderExternal(LogicalProvider::class, 'provide')]
+    #[DataProviderExternal(CollectionProvider::class, 'provide')]
     #[DataProviderExternal(FunctionProvider::class, 'provide')]
     #[DataProviderExternal(PrimaryProvider::class, 'provide')]
     public function testItParsesSimpleTokens(Node $expectedNode, Token ...$tokens): void
