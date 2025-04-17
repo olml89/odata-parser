@@ -154,6 +154,20 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
                 new ValueToken(TokenKind::Boolean, 'true'),
                 new OperatorToken(TokenKind::CloseParen),
             ],
+            'redundant boolean comparison' => [
+                new AndOperator(
+                    new Equal(
+                        new Property('active'),
+                        new Literal(new BooleanValue(true)),
+                    ),
+                    new Property('active'),
+                ),
+                new ValueToken(TokenKind::Identifier, 'active', ),
+                new OperatorToken(TokenKind::Equal),
+                new ValueToken(TokenKind::Boolean, 'true'),
+                new OperatorToken(TokenKind::And),
+                new ValueToken(TokenKind::Identifier, 'active', ),
+            ],
         ];
     }
 }

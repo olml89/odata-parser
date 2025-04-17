@@ -8,7 +8,7 @@ use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 
-final readonly class CollectionOperatorProvider implements InputAndExpectedTokenProvider
+final readonly class CollectionOperatorTokensProvider implements InputAndExpectedTokensProvider
 {
     /**
      * @return array<string, array{0: string, 1: Token}>

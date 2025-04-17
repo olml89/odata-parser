@@ -15,8 +15,8 @@ final class ArgumentCountException extends ParserException
             sprintf(
                 'Function %s needs %s arguments, %s provided',
                 $functionName->value,
-                $providedArgumentsCount,
                 $neededArgumentsCount,
+                $providedArgumentsCount,
             ),
         );
     }

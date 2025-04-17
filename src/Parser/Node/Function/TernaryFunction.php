@@ -10,7 +10,7 @@ use olml89\ODataParser\Parser\Node\Property;
 /**
  * @mixin FunctionNode
  */
-abstract readonly class BinaryFunction
+abstract readonly class TernaryFunction
 {
     use IsFunction;
     use HasMultipleOperands;
@@ -20,22 +20,24 @@ abstract readonly class BinaryFunction
      */
     final public function __construct(
         public Property|FunctionNode $operand,
-        public Node $argument,
+        public Node $leftArgument,
+        public Node $rightArgument,
     ) {
     }
 
     protected static function getOperandsCount(): int
     {
-        return 2;
+        return 3;
     }
 
     public function __toString(): string
     {
         return sprintf(
-            '%s(%s, %s)',
+            '%s(%s, %s, %s)',
             static::name()->value,
             $this->operand,
-            $this->argument,
+            $this->leftArgument,
+            $this->rightArgument,
         );
     }
 }

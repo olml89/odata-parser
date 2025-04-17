@@ -7,10 +7,13 @@ namespace olml89\ODataParser\Parser\Node\Operator\Comparison;
 use olml89\ODataParser\Lexer\Keyword\ComparisonOperator;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
+use olml89\ODataParser\Parser\Node\Operator\IsOperator;
 use olml89\ODataParser\Parser\Node\Property;
 
 final readonly class In implements Node
 {
+    use IsOperator;
+
     public Property $property;
 
     /**

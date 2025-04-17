@@ -14,6 +14,11 @@ final readonly class Literal implements Node
     ) {
     }
 
+    public function isPrimary(): bool
+    {
+        return true;
+    }
+
     public function __toString(): string
     {
         return is_null($this->value) ? TypeConstant::null->value : (string)$this->value;

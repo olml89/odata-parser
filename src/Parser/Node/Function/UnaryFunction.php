@@ -11,8 +11,10 @@ use olml89\ODataParser\Parser\Node\Property;
  */
 abstract readonly class UnaryFunction
 {
+    use IsFunction;
+
     public function __construct(
-        public Property $property,
+        public Property|FunctionNode $operand,
     ) {
     }
 
@@ -21,7 +23,7 @@ abstract readonly class UnaryFunction
         return sprintf(
             '%s(%s)',
             static::name()->value,
-            $this->property,
+            $this->operand,
         );
     }
 }

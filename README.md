@@ -95,10 +95,20 @@ The following operators, functions and literals are supported:
 | length         | length(name) eq 12                                                 |
 | matchesPattern | matchesPattern(name, '^([^aeiou](\w\|\s)*)\|((\w\|\s)*[^aeiou])$') |
 | startswith     | startswith(name, 'John')                                           |
-| substring      | substring(name, 1) eq 'ohn McClane'                                |
+| substring      | substring(name, 1, 3) eq 'ohn '                                    |
 | tolower        | tolower(name) eq 'john mcclane'                                    |
 | toupper        | toupper(name) eq 'JOHN MCCLANE'                                    |
 | trim           | trim(name) eq 'johnmcclane'                                        |
+
+Note that the previous `substringof`, which was a boolean function that was used to check if a string haystack 
+contained a string needle, was deprecated, and it has been replaced by `contains`. The function `substring`has taken
+its place, and its meant to be used like `mb_substr` in PHP, with the following signature:
+
+```php
+substring(property, startIndex, ?length)
+```
+That extracts a substring from startIndex (and optionally until length, or until the string end if length is not
+provided).
 
 | **Literal** | **Example**  |
 |-------------|--------------|

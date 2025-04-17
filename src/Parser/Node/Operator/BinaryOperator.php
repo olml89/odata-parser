@@ -9,6 +9,8 @@ use olml89\ODataParser\Parser\Node\Node;
 
 abstract readonly class BinaryOperator
 {
+    use IsOperator;
+
     public function __construct(
         public Node $left,
         public Node $right,
@@ -21,9 +23,14 @@ abstract readonly class BinaryOperator
     {
         return sprintf(
             '%s %s %s',
-            $this->left,
+            $this->wrapNode($this->left),
             $this->keyword()->value,
-            $this->right,
+            $this->wrapNode($this->right),
         );
+    }
+
+    protected function wrapNode(Node $node): string
+    {
+        return !$node->isPrimary() ? '(' . $node . ')' : (string)$node;
     }
 }

@@ -22,6 +22,7 @@ use olml89\ODataParser\Parser\Node\Function\Trim;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
 use olml89\ODataParser\Parser\Node\Property;
+use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
 
 final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
@@ -110,13 +111,29 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             'substring' => [
                 new Substring(
                     new Property('identifier'),
-                    new Literal(new StringValue('abcde')),
+                    new Literal(new IntValue(2)),
+                    new Literal(new IntValue(4)),
                 ),
-                ...self::createBinaryFunctionTokens(
-                    functionName: 'substring',
-                    identifier: 'identifier',
-                    value: 'abcde',
+                new ValueToken(
+                    TokenKind::Function,
+                    'substring',
                 ),
+                new OperatorToken(TokenKind::OpenParen),
+                new ValueToken(
+                    TokenKind::Identifier,
+                    'identifier',
+                ),
+                new OperatorToken(TokenKind::Comma),
+                new ValueToken(
+                    TokenKind::Number,
+                    '2',
+                ),
+                new OperatorToken(TokenKind::Comma),
+                new ValueToken(
+                    TokenKind::Number,
+                    '4',
+                ),
+                new OperatorToken(TokenKind::CloseParen),
             ],
             'tolower' => [
                 new ToLower(

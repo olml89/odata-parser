@@ -6,6 +6,7 @@ namespace olml89\ODataParser\Lexer;
 
 use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
 use olml89\ODataParser\Lexer\Exception\UnterminatedStringException;
+use olml89\ODataParser\Lexer\Keyword\FunctionName;
 use olml89\ODataParser\Lexer\Keyword\Keyword;
 use olml89\ODataParser\Lexer\Keyword\SpecialChar;
 
@@ -58,35 +59,70 @@ final class Source
         return $this->charAt($this->position) ?? throw new CharOutOfBoundsException($this->position, $this->length());
     }
 
+    private function keywordMatches(Keyword $keyword): bool
+    {
+        $currentSubstring = $this->substring(start: $this->position, length: mb_strlen($keyword->value));
+
+        if (mb_strtolower($currentSubstring) !== mb_strtolower($keyword->value)) {
+            return false;
+        }
+
+        /**
+         * If it is a special char, we don't check anything else. A match is a match. We only have to check
+         * if the keyword can be part of something else with keywords that are not a special char, for ex.,
+         * operators, functions...
+         */
+        if ($keyword instanceof SpecialChar) {
+            return true;
+        }
+
+        /**
+         * If it matches a function name, we have to check that the following character is either an opening
+         * parentheses, or that it has an opening parentheses after white spaces:
+         *  * contains(name, 'abc')
+         *  * contains    (name, 'abc')
+         *
+         * If not, we have to assume that may be an identifier that's named as a valid function name:
+         *  'contains eq true' may refer to a contains boolean property, instead of to the contains function.
+         *
+         * If there's no char left after the match, we have reached the end of the string without finding a valid
+         * OpenParen, so the function call is invalid.
+         */
+        if ($keyword instanceof FunctionName) {
+            $position = $this->position + mb_strlen($keyword->value);
+
+            while (!$this->eof() && $this->charAt($position)?->equals(SpecialChar::WhiteSpace)) {
+                ++$position;
+            }
+
+            return $this
+                ->charAt($position)
+                ?->equals(SpecialChar::OpenParen) ?? false;
+        }
+
+        /**
+         * This comparison is to prevent perfectly valid strings that partially match a keyword,
+         * such as 'order', being prematurely lexed into a keyword token and an identifier token for the
+         * remaining part, f.ex: 'order' => 'or', 'der'
+         *
+         * We consider a substring has to be considered ended if it founds a special char, f. ex:
+         *  * true,     -> it is a literal true token and a comma token
+         *  * trueBlood -> it is a literal string token with value 'trueBlood'
+         *
+         * In this case, i there's no char left after the match, we have reached the end of the string, so technically
+         * we have found a valid keyword, although it is probably syntactically invalid unless it is close
+         * parentheses. But that's a problem for the parser.
+         */
+        return $this
+            ->charAt($this->position + mb_strlen($keyword->value))
+            ?->equals(...SpecialChar::cases()) ?? true;
+    }
+
     public function find(Keyword ...$keywords): ?Keyword
     {
         $found = array_find(
             $keywords,
-            function (Keyword $keyword): bool {
-                $currentSubstring = $this->substring(start: $this->position, length: mb_strlen($keyword->value));
-
-                if (mb_strtolower($currentSubstring) !== mb_strtolower($keyword->value)) {
-                    return false;
-                }
-
-                /**
-                 * If it is a special char, we don't check anything else. A match is a match. We only have to check
-                 * if the keyword can be part of something else with keywords that are not a special char, for ex.,
-                 * operators, functions...
-                 */
-                if ($keyword instanceof SpecialChar) {
-                    return true;
-                }
-
-                /**
-                 * If there's no char left after the match, we have reached the end of the string, so technically we
-                 * have found a valid keyword, although it is probably syntactically invalid unless it is close
-                 * parentheses. But that's a problem for the parser.
-                 */
-                return $this
-                    ->charAt($this->position + mb_strlen($keyword->value))
-                    ?->equals(SpecialChar::WhiteSpace, SpecialChar::OpenParen) ?? true;
-            },
+            fn (Keyword $keyword): bool => $this->keywordMatches($keyword),
         );
 
         if (!is_null($found)) {

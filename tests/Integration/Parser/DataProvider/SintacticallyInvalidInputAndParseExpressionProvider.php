@@ -37,8 +37,8 @@ final readonly class SintacticallyInvalidInputAndParseExpressionProvider
                 'substring(name)',
                 new ArgumentCountException(
                     functionName: FunctionName::substring,
-                    providedArgumentsCount: 0,
-                    neededArgumentsCount: 2,
+                    providedArgumentsCount: 1,
+                    neededArgumentsCount: 3,
                 ),
             ],
         ];

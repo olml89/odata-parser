@@ -80,9 +80,9 @@ final readonly class Parser
      * parseOr()
      *      parseAnd()
      *          parseComparison()
-     *              parseArithmetic()
-     *                  parseNot()
-     *                      parsePrimary() [parentheses, functions, literals]
+     *              parseNot()
+     *                  parseArithmetic()
+     *                      parseExpression()
      *
      * @throws TokenOutOfBoundsException
      * @throws ArgumentCountException
@@ -127,14 +127,14 @@ final readonly class Parser
      */
     private function parseComparison(): Node
     {
-        $left = $this->parseArithmetic();
+        $left = $this->parseNot();
 
         if ($left instanceof Property && $this->tokens->peek()->consume(TokenKind::In)) {
             $this->tokens->peek()->expect(TokenKind::OpenParen);
             $values = [];
 
             while (!$this->tokens->peek()->is(TokenKind::CloseParen)) {
-                $expression = $this->parseArithmetic();
+                $expression = $this->parseNot();
 
                 if ($expression instanceof Literal) {
                     $values[] = $expression;
@@ -151,36 +151,58 @@ final readonly class Parser
         $comparison = match (true) {
             $this->tokens->peek()->consume(TokenKind::Equal) => new Equal(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::NotEqual) => new NotEqual(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::LessThan) => new LessThan(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::LessThanOrEqual) => new LessThanOrEqual(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::GreaterThan) => new GreaterThan(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::GreaterThanOrEqual) => new GreaterThanOrEqual(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             $this->tokens->peek()->consume(TokenKind::Has) => new Has(
                 $left,
-                $this->parseArithmetic(),
+                $this->parseNot(),
             ),
             default => null,
         };
 
         return $comparison ?? $left;
+    }
+
+    /**
+     * @throws TokenOutOfBoundsException
+     * @throws ArgumentCountException
+     * @throws UnexpectedTokenException
+     * @throws CastingException
+     */
+    private function parseNot(): Node
+    {
+        if ($this->tokens->peek()->consume(TokenKind::Not)) {
+            if ($this->tokens->peek()->consume(TokenKind::OpenParen)) {
+                $subExpression = $this->parseOr();
+                $this->tokens->peek()->expect(TokenKind::CloseParen);
+
+                return new NotOperator($subExpression);
+            }
+
+            return new NotOperator($this->parseComparison());
+        }
+
+        return $this->parseArithmetic();
     }
 
     /**
@@ -195,10 +217,10 @@ final readonly class Parser
          * The unary arithmetic takes precedence
          */
         if ($this->tokens->peek()->consume(TokenKind::Minus)) {
-            return new Minus($this->parseNot());
+            return new Minus($this->parseExpression());
         }
 
-        $node = $this->parseNot();
+        $node = $this->parseExpression();
 
         if ($this->tokens->eof()) {
             return $node;
@@ -237,28 +259,11 @@ final readonly class Parser
                 break;
             }
 
-            $right = $this->parseNot();
+            $right = $this->parseExpression();
             $node = $next($right);
         }
 
         return $node;
-    }
-
-    /**
-     * @throws TokenOutOfBoundsException
-     * @throws ArgumentCountException
-     * @throws UnexpectedTokenException
-     * @throws CastingException
-     */
-    private function parseNot(): Node
-    {
-        if ($this->tokens->peek()->consume(TokenKind::Not)) {
-            $operand = $this->parseNot();
-
-            return new NotOperator($operand);
-        }
-
-        return $this->parseExpression();
     }
 
     /**

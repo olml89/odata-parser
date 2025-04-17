@@ -8,4 +8,5 @@ use Stringable;
 
 interface Node extends Stringable
 {
+    public function isPrimary(): bool;
 }

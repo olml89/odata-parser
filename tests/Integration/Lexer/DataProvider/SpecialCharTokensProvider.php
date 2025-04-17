@@ -8,7 +8,7 @@ use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 
-final readonly class SpecialCharProvider implements InputAndExpectedTokenProvider
+final readonly class SpecialCharTokensProvider implements InputAndExpectedTokensProvider
 {
     /**
      * @return array<string, array{0: string, 1: Token}>
@@ -16,14 +16,25 @@ final readonly class SpecialCharProvider implements InputAndExpectedTokenProvide
     public static function provide(): array
     {
         return [
-            'parentheses' => [
-                '()',
+            'open parentheses' => [
+                '(',
                 new OperatorToken(TokenKind::OpenParen),
+            ],
+            'close parentheses' => [
+                ')',
                 new OperatorToken(TokenKind::CloseParen),
             ],
             'comma' => [
                 ',',
                 new OperatorToken(TokenKind::Comma),
+            ],
+            'colon' => [
+                ':',
+                new OperatorToken(TokenKind::Colon),
+            ],
+            'slash' => [
+                '/',
+                new OperatorToken(TokenKind::Slash),
             ],
         ];
     }

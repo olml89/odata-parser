@@ -10,6 +10,8 @@ use olml89\ODataParser\Parser\Node\Property;
 
 abstract readonly class CollectionLambdaOperator
 {
+    use IsOperator;
+
     public function __construct(
         public Property $property,
         public Property $variable,

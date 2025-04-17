@@ -23,10 +23,10 @@ trait IsArithmetic
         );
     }
 
-    private function wrapNode(Node $node): string
+    protected function wrapNode(Node $node): string
     {
-        return $this->isPreferent() && $node instanceof ArithmeticNode
-            ? "(" . $node . ")"
+        return $node instanceof ArithmeticNode && $this->isPreferent()
+            ? '(' . $node . ')'
             : (string) $node;
     }
 }

@@ -25,11 +25,4 @@ final readonly class OrOperator extends BinaryOperator implements Node
             $this->wrapNode($this->right),
         );
     }
-
-    private function wrapNode(Node $node): string
-    {
-        return $node instanceof AndOperator || $node instanceof OrOperator
-            ? "(" . $node . ")"
-            : (string)$node;
-    }
 }

@@ -10,6 +10,7 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\Node\Function\BinaryFunction;
+use olml89\ODataParser\Parser\Node\Function\TernaryFunction;
 use olml89\ODataParser\Parser\Node\Function\UnaryFunction;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
@@ -51,6 +52,7 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(Property::class)]
 #[UsesClass(PropertyTree::class)]
+#[UsesClass(TernaryFunction::class)]
 #[UsesClass(TokenManager::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(TokenWrapper::class)]

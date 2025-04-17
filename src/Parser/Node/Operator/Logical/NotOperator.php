@@ -15,7 +15,7 @@ final readonly class NotOperator extends UnaryOperator implements Node
         return sprintf(
             '%s %s',
             LogicalOperator::not->value,
-            $this->operand,
+            $this->wrapNode($this->operand),
         );
     }
 }

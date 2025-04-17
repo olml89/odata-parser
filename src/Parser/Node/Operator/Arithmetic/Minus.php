@@ -15,7 +15,7 @@ final readonly class Minus extends UnaryOperator implements Node
         return sprintf(
             '%s%s',
             ArithmeticOperator::minus->value,
-            $this->operand,
+            $this->wrapNode($this->operand),
         );
     }
 }

@@ -6,7 +6,7 @@ namespace Tests\Integration\Lexer\DataProvider;
 
 use olml89\ODataParser\Lexer\Token\Token;
 
-interface InputAndExpectedTokenProvider
+interface InputAndExpectedTokensProvider
 {
     /**
      * @return array<string, array{0: string, 1: Token}>

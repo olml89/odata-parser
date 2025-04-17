@@ -28,13 +28,13 @@ use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase;
-use Tests\Integration\Lexer\DataProvider\ArithmeticOperatorProvider;
-use Tests\Integration\Lexer\DataProvider\CollectionOperatorProvider;
-use Tests\Integration\Lexer\DataProvider\ComparisonOperatorProvider;
-use Tests\Integration\Lexer\DataProvider\FunctionProvider;
-use Tests\Integration\Lexer\DataProvider\LiteralProvider;
-use Tests\Integration\Lexer\DataProvider\LogicalOperatorProvider;
-use Tests\Integration\Lexer\DataProvider\SpecialCharProvider;
+use Tests\Integration\Lexer\DataProvider\ArithmeticOperatorTokensProvider;
+use Tests\Integration\Lexer\DataProvider\CollectionOperatorTokensProvider;
+use Tests\Integration\Lexer\DataProvider\ComparisonOperatorTokensProvider;
+use Tests\Integration\Lexer\DataProvider\FunctionTokensProvider;
+use Tests\Integration\Lexer\DataProvider\LiteralTokensProvider;
+use Tests\Integration\Lexer\DataProvider\LogicalOperatorTokensProvider;
+use Tests\Integration\Lexer\DataProvider\SpecialCharTokensProvider;
 
 #[CoversClass(Lexer::class)]
 #[UsesClass(Char::class)]
@@ -113,13 +113,13 @@ final class LexerTest extends TestCase
         $lexer->tokenize();
     }
 
-    #[DataProviderExternal(FunctionProvider::class, 'provide')]
-    #[DataProviderExternal(SpecialCharProvider::class, 'provide')]
-    #[DataProviderExternal(ArithmeticOperatorProvider::class, 'provide')]
-    #[DataProviderExternal(ComparisonOperatorProvider::class, 'provide')]
-    #[DataProviderExternal(LogicalOperatorProvider::class, 'provide')]
-    #[DataProviderExternal(CollectionOperatorProvider::class, 'provide')]
-    #[DataProviderExternal(LiteralProvider::class, 'provide')]
+    #[DataProviderExternal(FunctionTokensProvider::class, 'provide')]
+    #[DataProviderExternal(SpecialCharTokensProvider::class, 'provide')]
+    #[DataProviderExternal(ArithmeticOperatorTokensProvider::class, 'provide')]
+    #[DataProviderExternal(ComparisonOperatorTokensProvider::class, 'provide')]
+    #[DataProviderExternal(LogicalOperatorTokensProvider::class, 'provide')]
+    #[DataProviderExternal(CollectionOperatorTokensProvider::class, 'provide')]
+    #[DataProviderExternal(LiteralTokensProvider::class, 'provide')]
     public function testItTokenizesInput(string $input, Token ...$expectedTokens): void
     {
         $lexer = new Lexer($input);

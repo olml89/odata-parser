@@ -65,15 +65,45 @@ final class SourceTest extends TestCase
                 LogicalOperator::and,
                 LogicalOperator::and,
             ],
-            'keyword followed by end of string' => [
-                'contains',
-                FunctionName::contains,
-                FunctionName::contains,
+            'keyword followed by close parentheses' => [
+                'not)',
+                LogicalOperator::not,
+                LogicalOperator::not,
             ],
-            'special char followed by another special char' => [
-                ')(',
-                SpecialChar::CloseParen,
-                SpecialChar::CloseParen,
+            'keyword followed by single quote' => [
+                'eq\'',
+                ComparisonOperator::eq,
+                ComparisonOperator::eq,
+            ],
+            'keyword followed by double quote' => [
+                'ne"',
+                ComparisonOperator::ne,
+                ComparisonOperator::ne,
+            ],
+            'keyword followed by comma' => [
+                'add,',
+                ArithmeticOperator::add,
+                ArithmeticOperator::add,
+            ],
+            'keyword followed by dot' => [
+                'sub.',
+                ArithmeticOperator::sub,
+                ArithmeticOperator::sub,
+            ],
+            'keyword followed by colon' => [
+                'true:',
+                TypeConstant::true,
+                TypeConstant::true,
+            ],
+            'keyword followed by slash' => [
+                'false/',
+                TypeConstant::false,
+                TypeConstant::false,
+            ],
+            'keyword followed by end of string' => [
+                'mod',
+                ArithmeticOperator::mod,
+                ArithmeticOperator::mod,
             ],
             'special char followed by alpha char' => [
                 ')a',
@@ -85,6 +115,16 @@ final class SourceTest extends TestCase
                 SpecialChar::CloseParen,
                 SpecialChar::CloseParen,
             ],
+            'function name followed by open parentheses' => [
+                'indexof(',
+                FunctionName::indexof,
+                FunctionName::indexof,
+            ],
+            'function name followed by open parentheses after a group of white spaces' => [
+                'substring    (',
+                FunctionName::substring,
+                FunctionName::substring,
+            ],
         ];
     }
 
@@ -94,39 +134,24 @@ final class SourceTest extends TestCase
     public static function provideInputAndNull(): array
     {
         return [
-            'keyword followed by close parentheses' => [
-                'not)',
-                LogicalOperator::not,
+            'function name followed by alpha character after white spaces' => [
+                'contains eq true',
+                FunctionName::contains,
                 null,
             ],
-            'keyword followed by single quote' => [
-                'eq\'',
-                ComparisonOperator::eq,
+            'function name followed by special char not being open parentheses after white spaces' => [
+                'contains  ,',
+                FunctionName::contains,
                 null,
             ],
-            'keyword followed by double quote' => [
-                'ne"',
-                ComparisonOperator::ne,
+            'function name followed by end of string' => [
+                'contains',
+                FunctionName::contains,
                 null,
             ],
-            'keyword followed by comma' => [
-                'add,',
-                ArithmeticOperator::add,
-                null,
-            ],
-            'keyword followed by dot' => [
-                'toupper.',
-                FunctionName::toupper,
-                null,
-            ],
-            'keyword followed by colon' => [
-                'true:',
-                TypeConstant::true,
-                null,
-            ],
-            'keyword followed by slash' => [
-                'false/',
-                TypeConstant::false,
+            'function name followed by end of string after a group of white spaces' => [
+                'substring     ',
+                FunctionName::substring,
                 null,
             ],
             'keyword followed by any other alpha char' => [
