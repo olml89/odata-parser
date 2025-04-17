@@ -46,7 +46,7 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
                 new ValueToken(TokenKind::String, 'yes'),
                 new OperatorToken(TokenKind::CloseParen),
             ],
-            'any accessing property entities' => [
+            'any accessing entity properties' => [
                 new Any(
                     property: new Property('orders'),
                     variable: new Property('o'),
@@ -62,6 +62,32 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
                 new ValueToken(TokenKind::Identifier, 'o'),
                 new OperatorToken(TokenKind::Colon),
                 new ValueToken(TokenKind::Identifier, 'o'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'amount'),
+                new OperatorToken(TokenKind::GreaterThan),
+                new ValueToken(TokenKind::Number, '100'),
+                new OperatorToken(TokenKind::CloseParen),
+            ],
+            'any accessing nested entity properties' => [
+                new Any(
+                    property: new Property('order', new Property('items')),
+                    variable: new Property('i'),
+                    predicate: new GreaterThan(
+                        new Property('i', new Property('invoice', new Property('amount'))),
+                        new Literal(new IntValue(100)),
+                    )
+                ),
+                new ValueToken(TokenKind::Identifier, 'order'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'items'),
+                new OperatorToken(TokenKind::Slash),
+                new OperatorToken(TokenKind::Any),
+                new OperatorToken(TokenKind::OpenParen),
+                new ValueToken(TokenKind::Identifier, 'i'),
+                new OperatorToken(TokenKind::Colon),
+                new ValueToken(TokenKind::Identifier, 'i'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'invoice'),
                 new OperatorToken(TokenKind::Slash),
                 new ValueToken(TokenKind::Identifier, 'amount'),
                 new OperatorToken(TokenKind::GreaterThan),
@@ -88,7 +114,7 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
                 new ValueToken(TokenKind::String, 'yes'),
                 new OperatorToken(TokenKind::CloseParen),
             ],
-            'all accessing property entities' => [
+            'all accessing entity properties' => [
                 new All(
                     property: new Property('orders'),
                     variable: new Property('o'),
@@ -104,6 +130,32 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
                 new ValueToken(TokenKind::Identifier, 'o'),
                 new OperatorToken(TokenKind::Colon),
                 new ValueToken(TokenKind::Identifier, 'o'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'amount'),
+                new OperatorToken(TokenKind::GreaterThan),
+                new ValueToken(TokenKind::Number, '100'),
+                new OperatorToken(TokenKind::CloseParen),
+            ],
+            'all accessing nested entity properties' => [
+                new All(
+                    property: new Property('order', new Property('items')),
+                    variable: new Property('i'),
+                    predicate: new GreaterThan(
+                        new Property('i', new Property('invoice', new Property('amount'))),
+                        new Literal(new IntValue(100)),
+                    )
+                ),
+                new ValueToken(TokenKind::Identifier, 'order'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'items'),
+                new OperatorToken(TokenKind::Slash),
+                new OperatorToken(TokenKind::All),
+                new OperatorToken(TokenKind::OpenParen),
+                new ValueToken(TokenKind::Identifier, 'i'),
+                new OperatorToken(TokenKind::Colon),
+                new ValueToken(TokenKind::Identifier, 'i'),
+                new OperatorToken(TokenKind::Slash),
+                new ValueToken(TokenKind::Identifier, 'invoice'),
                 new OperatorToken(TokenKind::Slash),
                 new ValueToken(TokenKind::Identifier, 'amount'),
                 new OperatorToken(TokenKind::GreaterThan),

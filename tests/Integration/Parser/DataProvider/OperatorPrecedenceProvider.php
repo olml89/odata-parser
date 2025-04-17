@@ -24,6 +24,10 @@ final readonly class OperatorPrecedenceProvider
                 'age ge 18 and startswith(name, \'J\')',
                 'age ge 18 and startswith(name, \'J\')',
             ],
+            'nested properties' => [
+                'orders/items/invoice/amount gt 100',
+                'orders/items/invoice/amount gt 100',
+            ],
             'nested functions as arguments for other functions' => [
                 'endswith(tolower(name), \'smith\')',
                 'endswith(tolower(name), \'smith\')',
@@ -88,6 +92,10 @@ final readonly class OperatorPrecedenceProvider
                 'orders/any(o: o/amount gt 100 and o/status eq \'open\')',
                 'orders/any(o: o/amount gt 100 and o/status eq \'open\')',
             ],
+            'any accessing nested entity properties' => [
+                'order/items/any(i: i/invoice/amount gt 100 and i/status eq \'open\')',
+                'order/items/any(i: i/invoice/amount gt 100 and i/status eq \'open\')',
+            ],
             'all accessing entities' => [
                 'status/all(s: s in (\'processing\', \'accepted\'))',
                 'status/all(s: s in (\'processing\', \'accepted\'))',
@@ -95,6 +103,10 @@ final readonly class OperatorPrecedenceProvider
             'all accessing entity properties' => [
                 'orders/all(o: o/amount gt 100 and o/status eq \'open\')',
                 'orders/all(o: o/amount gt 100 and o/status eq \'open\')',
+            ],
+            'all accessing nested entity properties' => [
+                'order/items/all(i: i/invoice/amount gt 100 and i/status eq \'open\')',
+                'order/items/all(i: i/invoice/amount gt 100 and i/status eq \'open\')',
             ],
             'combination of functions, parentheses, not, or, and: and takes precedence, parentheses added' => [
                 'not startswith(name, \'J\') or endswith(name, \'Smith\') and age ge 18',

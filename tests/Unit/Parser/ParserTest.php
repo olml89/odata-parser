@@ -18,6 +18,7 @@ use olml89\ODataParser\Parser\Node\Operator\CollectionLambdaOperator;
 use olml89\ODataParser\Parser\Node\Operator\Comparison\In;
 use olml89\ODataParser\Parser\Node\Operator\UnaryOperator;
 use olml89\ODataParser\Parser\Node\Property;
+use olml89\ODataParser\Parser\Node\PropertyTree;
 use olml89\ODataParser\Parser\Node\Value\BooleanValue;
 use olml89\ODataParser\Parser\Node\Value\FloatValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
@@ -49,6 +50,7 @@ use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 #[UsesClass(Literal::class)]
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(Property::class)]
+#[UsesClass(PropertyTree::class)]
 #[UsesClass(TokenManager::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(TokenWrapper::class)]

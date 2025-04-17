@@ -45,6 +45,7 @@ use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\NotOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
 use olml89\ODataParser\Parser\Node\Property;
+use olml89\ODataParser\Parser\Node\PropertyTree;
 use olml89\ODataParser\Parser\Node\Value\CastingException;
 use olml89\ODataParser\Parser\Node\Value\Value;
 
@@ -315,59 +316,6 @@ final readonly class Parser
         }
 
         /**
-         * Collection operators (any, all)
-         */
-        if ($peek->token instanceof ValueToken && $peek->consume(TokenKind::Identifier)) {
-            $property = new Property($peek->token->value);
-
-            if (!$this->tokens->peek()->consume(TokenKind::Slash)) {
-                return $property;
-            }
-
-            $next = $this->tokens->peek();
-
-            /**
-             * Compound properties, which represent $entity->property.
-             *
-             * In OData they are expressed with a slash, for example:
-             * orders/any(o: o/amount gt 100 and o/status eq 'open')
-             */
-            if ($next->token instanceof ValueToken && $next->consume(TokenKind::Identifier)) {
-                return new Property(
-                    $property->name,
-                    new Property($next->token->value),
-                );
-            }
-
-            if (!$next->consume(TokenKind::Any, TokenKind::All)) {
-                throw UnexpectedTokenException::position($next->token, $next->position);
-            }
-
-            $collectionOperatorToken = $next->token;
-            $this->tokens->peek()->expect(TokenKind::OpenParen);
-
-            /** @var ValueToken $variableToken */
-            $variableToken = $this->tokens->peek()->expect(TokenKind::Identifier)->token;
-            $variable = new Property($variableToken->value);
-
-            $this->tokens->peek()->expect(TokenKind::Colon);
-            $predicate = $this->parseOr();
-            $this->tokens->peek()->expect(TokenKind::CloseParen);
-
-            $collectionLambda = match ($collectionOperatorToken->kind) {
-                TokenKind::Any => new Any($property, $variable, $predicate),
-                TokenKind::All => new All($property, $variable, $predicate),
-                default => null,
-            };
-
-            return $collectionLambda ?? throw UnexpectedTokenException::wrongTokenKind(
-                $collectionOperatorToken,
-                TokenKind::Any,
-                TokenKind::All,
-            );
-        }
-
-        /**
          * Primaries (properties, values)
          */
         $primary = !($peek->token instanceof ValueToken) ? null : match (true) {
@@ -378,6 +326,59 @@ final readonly class Parser
             $peek->consume(TokenKind::String),      => new Literal(Value::fromValueToken($peek->token)),
             default                                             => null,
         };
+
+        /**
+         * Collection operators (any, all)
+         *
+         * OData nested properties, which represent structures like $entity->property->property in PHP.
+         */
+        if ($primary instanceof Property) {
+            $propertyTree = new PropertyTree($primary);
+
+            /**
+             * The OData protocol defines they are expressed with slashes separating each nested property, for example:
+             * order/items/any(i: i/invoice/amount gt 100 and i/status eq 'open')
+             */
+            while ($this->tokens->peek()->consume(TokenKind::Slash)) {
+                $next = $this->tokens->peek();
+
+                if ($next->consume(TokenKind::Any, TokenKind::All)) {
+                    $property = $propertyTree->build();
+                    $this->tokens->peek()->expect(TokenKind::OpenParen);
+                    $variableAlias = $this->tokens->peek()->expect(TokenKind::Identifier);
+
+                    if (!($variableAlias->token instanceof ValueToken)) {
+                        throw UnexpectedTokenException::position($variableAlias->token, $variableAlias->position);
+                    }
+
+                    $variable = new Property($variableAlias->token->value);
+
+                    $this->tokens->peek()->expect(TokenKind::Colon);
+                    $predicate = $this->parseOr();
+                    $this->tokens->peek()->expect(TokenKind::CloseParen);
+
+                    $collectionLambda = match ($next->token->kind) {
+                        TokenKind::Any => new Any($property, $variable, $predicate),
+                        TokenKind::All => new All($property, $variable, $predicate),
+                        default => null,
+                    };
+
+                    return $collectionLambda ?? throw UnexpectedTokenException::wrongTokenKind(
+                        $next->token,
+                        TokenKind::Any,
+                        TokenKind::All,
+                    );
+                }
+
+                if (!($next->token instanceof ValueToken) || !$next->consume(TokenKind::Identifier)) {
+                    return $primary;
+                }
+
+                $propertyTree->addSubProperty(new Property($next->token->value));
+            }
+
+            return $propertyTree->build();
+        }
 
         return $primary ?? throw UnexpectedTokenException::position($peek->token, $peek->position);
     }

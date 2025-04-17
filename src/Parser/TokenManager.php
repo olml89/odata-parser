@@ -46,20 +46,38 @@ final class TokenManager
     }
 
     /**
+     * @param int $position
+     * @return TokenWrapper
      * @throws TokenOutOfBoundsException
      */
-    public function peek(): TokenWrapper
+    private function get(int $position): TokenWrapper
     {
-        $token = $this->tokens[$this->position] ?? null;
+        $token = $this->tokens[$position] ?? null;
 
         if (is_null($token)) {
-            throw new TokenOutOfBoundsException($this->position, $this->count());
+            throw new TokenOutOfBoundsException($position, $this->count());
         }
 
         return new TokenWrapper(
             token: $token,
-            position: $this->position,
+            position: $position,
             advanceTokenPosition: fn () => $this->advance(),
         );
+    }
+
+    /**
+     * @throws TokenOutOfBoundsException
+     */
+    public function peek(): TokenWrapper
+    {
+        return $this->get($this->position);
+    }
+
+    /**
+     * @throws TokenOutOfBoundsException
+     */
+    public function next(): TokenWrapper
+    {
+        return $this->get($this->position + 1);
     }
 }

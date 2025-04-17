@@ -52,6 +52,7 @@ use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\NotOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
 use olml89\ODataParser\Parser\Node\Property;
+use olml89\ODataParser\Parser\Node\PropertyTree;
 use olml89\ODataParser\Parser\Node\Value\BooleanValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
@@ -99,6 +100,7 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(OrOperator::class)]
 #[UsesClass(Property::class)]
+#[UsesClass(PropertyTree::class)]
 #[UsesClass(ScannerPipeline::class)]
 #[UsesClass(Source::class)]
 #[UsesClass(SpecialChar::class)]
