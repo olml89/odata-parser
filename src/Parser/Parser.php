@@ -7,7 +7,6 @@ namespace olml89\ODataParser\Parser;
 use olml89\ODataParser\Lexer\Keyword\FunctionName;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
-use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\Node\Function\ArgumentCountException;
@@ -230,27 +229,27 @@ final readonly class Parser
             $next = match (true) {
                 $this->tokens->peek()->consume(TokenKind::Mul) => fn (Node $right): Mul => new Mul(
                     $node,
-                    $right
+                    $right,
                 ),
                 $this->tokens->peek()->consume(TokenKind::Div) => fn (Node $right): Div => new Div(
                     $node,
-                    $right
+                    $right,
                 ),
                 $this->tokens->peek()->consume(TokenKind::DivBy) => fn (Node $right): DivBy => new DivBy(
                     $node,
-                    $right
+                    $right,
                 ),
                 $this->tokens->peek()->consume(TokenKind::Mod) => fn (Node $right): Mod => new Mod(
                     $node,
-                    $right
+                    $right,
                 ),
                 $this->tokens->peek()->consume(TokenKind::Add) => fn (Node $right): Add => new Add(
                     $node,
-                    $right
+                    $right,
                 ),
                 $this->tokens->peek()->consume(TokenKind::Sub) => fn (Node $right): Sub => new Sub(
                     $node,
-                    $right
+                    $right,
                 ),
                 default => null,
             };
@@ -289,8 +288,8 @@ final readonly class Parser
         /**
          * Functions
          */
-        if ($peek->token instanceof ValueToken && $peek->consume(TokenKind::Function)) {
-            $name = FunctionName::from($peek->token->value);
+        if ($peek->consume(TokenKind::Function)) {
+            $name = FunctionName::from($peek->valueToken()->value);
             $this->tokens->peek()->expect(TokenKind::OpenParen);
             $arguments = [];
 
@@ -323,12 +322,14 @@ final readonly class Parser
         /**
          * Primaries (properties, values)
          */
-        $primary = !($peek->token instanceof ValueToken) ? null : match (true) {
-            $peek->consume(TokenKind::Identifier),  => new Property($peek->token->value),
+        $valueToken = $peek->valueToken();
+
+        $primary = match (true) {
+            $peek->consume(TokenKind::Identifier),  => new Property($valueToken->value),
             $peek->consume(TokenKind::Null),
             $peek->consume(TokenKind::Boolean),
             $peek->consume(TokenKind::Number),
-            $peek->consume(TokenKind::String),      => new Literal(Value::fromValueToken($peek->token)),
+            $peek->consume(TokenKind::String),      => new Literal(Value::fromValueToken($valueToken)),
             default                                             => null,
         };
 
@@ -350,13 +351,10 @@ final readonly class Parser
                 if ($next->consume(TokenKind::Any, TokenKind::All)) {
                     $property = $propertyTree->build();
                     $this->tokens->peek()->expect(TokenKind::OpenParen);
-                    $variableAlias = $this->tokens->peek()->expect(TokenKind::Identifier);
 
-                    if (!($variableAlias->token instanceof ValueToken)) {
-                        throw UnexpectedTokenException::position($variableAlias->token, $variableAlias->position);
-                    }
-
-                    $variable = new Property($variableAlias->token->value);
+                    $variable = new Property(
+                        $this->tokens->peek()->expect(TokenKind::Identifier)->valueToken()->value,
+                    );
 
                     $this->tokens->peek()->expect(TokenKind::Colon);
                     $predicate = $this->parseOr();
@@ -375,11 +373,13 @@ final readonly class Parser
                     );
                 }
 
-                if (!($next->token instanceof ValueToken) || !$next->consume(TokenKind::Identifier)) {
+                if (!$next->consume(TokenKind::Identifier)) {
                     return $primary;
                 }
 
-                $propertyTree->addSubProperty(new Property($next->token->value));
+                $propertyTree->addSubProperty(
+                    new Property($next->valueToken()->value)
+                );
             }
 
             return $propertyTree->build();

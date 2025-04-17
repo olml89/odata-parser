@@ -7,6 +7,7 @@ namespace olml89\ODataParser\Parser;
 use Closure;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
+use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 
 final readonly class TokenWrapper
@@ -47,5 +48,17 @@ final readonly class TokenWrapper
         }
 
         return $this;
+    }
+
+    /**
+     * @throws UnexpectedTokenException
+     */
+    public function valueToken(): ValueToken
+    {
+        if (!($this->token instanceof ValueToken)) {
+            throw UnexpectedTokenException::position($this->token, $this->position);
+        }
+
+        return $this->token;
     }
 }

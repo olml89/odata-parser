@@ -7,6 +7,7 @@ namespace Tests\Unit\Parser;
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
+use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
 use olml89\ODataParser\Parser\TokenWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(UnexpectedTokenException::class)]
+#[UsesClass(ValueToken::class)]
 final class TokenWrapperTest extends TestCase
 {
     private bool $advanced = false;
@@ -64,5 +66,22 @@ final class TokenWrapperTest extends TestCase
         );
 
         $tokenWrapper->expect(TokenKind::Dot);
+    }
+
+    public function testValueToken(): void
+    {
+        $operatorToken = new OperatorToken(TokenKind::Comma);
+        $valueToken = new ValueToken(TokenKind::Identifier, 'abcde');
+
+        $this->assertEquals(
+            $valueToken,
+            $this->createTokenWrapper($valueToken)->valueToken(),
+        );
+
+        $this->expectExceptionObject(
+            UnexpectedTokenException::position($operatorToken, position: 0),
+        );
+
+        $this->createTokenWrapper($operatorToken)->valueToken();
     }
 }
