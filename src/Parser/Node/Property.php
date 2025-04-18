@@ -17,6 +17,21 @@ final readonly class Property implements Node
         return true;
     }
 
+    public function addSubProperty(Property $property): self
+    {
+        if (is_null($this->subProperty)) {
+            return new Property(
+                name: $this->name,
+                subProperty: $property,
+            );
+        }
+
+        return new Property(
+            name: $this->name,
+            subProperty: $this->subProperty->addSubProperty($property),
+        );
+    }
+
     public function __toString(): string
     {
         return is_null($this->subProperty)

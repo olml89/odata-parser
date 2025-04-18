@@ -44,7 +44,6 @@ use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\NotOperator;
 use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
 use olml89\ODataParser\Parser\Node\Property;
-use olml89\ODataParser\Parser\Node\PropertyTree;
 use olml89\ODataParser\Parser\Node\Value\CastingException;
 use olml89\ODataParser\Parser\Node\Value\Value;
 
@@ -339,7 +338,6 @@ final readonly class Parser
          * OData nested properties, which represent structures like $entity->property->property in PHP.
          */
         if ($primary instanceof Property) {
-            $propertyTree = new PropertyTree($primary);
 
             /**
              * The OData protocol defines they are expressed with slashes separating each nested property, for example:
@@ -349,7 +347,6 @@ final readonly class Parser
                 $next = $this->tokens->peek();
 
                 if ($next->consume(TokenKind::Any, TokenKind::All)) {
-                    $property = $propertyTree->build();
                     $this->tokens->peek()->expect(TokenKind::OpenParen);
 
                     $variable = new Property(
@@ -361,8 +358,8 @@ final readonly class Parser
                     $this->tokens->peek()->expect(TokenKind::CloseParen);
 
                     $collectionLambda = match ($next->token->kind) {
-                        TokenKind::Any => new Any($property, $variable, $predicate),
-                        TokenKind::All => new All($property, $variable, $predicate),
+                        TokenKind::Any => new Any($primary, $variable, $predicate),
+                        TokenKind::All => new All($primary, $variable, $predicate),
                         default => null,
                     };
 
@@ -377,12 +374,12 @@ final readonly class Parser
                     return $primary;
                 }
 
-                $propertyTree->addSubProperty(
-                    new Property($next->valueToken()->value)
+                $primary = $primary->addSubProperty(
+                    new Property($next->valueToken()->value),
                 );
             }
 
-            return $propertyTree->build();
+            return $primary;
         }
 
         return $primary ?? throw UnexpectedTokenException::position($peek->token, $peek->position);
