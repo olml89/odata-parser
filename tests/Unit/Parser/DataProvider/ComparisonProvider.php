@@ -10,16 +10,16 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThan;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThanOrEqual;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Has;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\In;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\LessThan;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\LessThanOrEqual;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\NotEqual;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Equal;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\GreaterThan;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\GreaterThanOrEqual;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Has;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\In;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\LessThan;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\LessThanOrEqual;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\NotEqual;
 use olml89\ODataParser\Parser\Node\Property;
-use olml89\ODataParser\Parser\Node\Value\BooleanValue;
+use olml89\ODataParser\Parser\Node\Value\BoolValue;
 use olml89\ODataParser\Parser\Node\Value\FloatValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
@@ -34,7 +34,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
         return [
             'equal' => [
                 new Equal(
-                    new Property('name'),
+                    Property::from('name'),
                     new Literal(new StringValue('John Smith'))
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -46,8 +46,8 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'not equal' => [
                 new NotEqual(
-                    new Property('accepted'),
-                    new Literal(new BooleanValue(true)),
+                    Property::from('accepted'),
+                    new Literal(new BoolValue(true)),
                 ),
                 ...self::createComparisonOperatorTokens(
                     property: 'accepted',
@@ -58,7 +58,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'less than' => [
                 new LessThan(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -70,7 +70,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'less than or equal' => [
                 new LessThanOrEqual(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new FloatValue(2.5)),
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -82,7 +82,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'greater than' => [
                 new GreaterThan(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -94,7 +94,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'greater than or equal' => [
                 new GreaterThanOrEqual(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new FloatValue(2.5)),
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -106,7 +106,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'has' => [
                 new Has(
-                    new Property('cities'),
+                    Property::from('cities'),
                     new Literal(new StringValue('Berlin')),
                 ),
                 ...self::createComparisonOperatorTokens(
@@ -118,7 +118,7 @@ final readonly class ComparisonProvider implements NodeAndExpectedTokensProvider
             ],
             'in' => [
                 new In(
-                    new Property('city'),
+                    Property::from('city'),
                     new Literal(new StringValue('Berlin')),
                     new Literal(new StringValue('Roma')),
                     new Literal(new StringValue('Paris')),

@@ -44,7 +44,7 @@ final readonly class ChatGPTFuzzyTestProvider
             ],
 
             /**
-             * 🔀 Logical operators
+             * 🔀 Logical expressions
              */
             [
                 'age gt 18 and age lt 30',
@@ -59,10 +59,7 @@ final readonly class ChatGPTFuzzyTestProvider
             /**
              * 🔍 'not' combined with 'in'
              */
-            [
-                'not (status in (\'inactive\', \'banned\'))',
-                'not status in (\'inactive\', \'banned\')'
-            ],
+            ['not (status in (\'inactive\', \'banned\'))'],
 
             /**
              * 🧼 'not' combined with boolean functions
@@ -132,7 +129,7 @@ final readonly class ChatGPTFuzzyTestProvider
             ['startswith eq \'yes\''],
 
             /**
-             * ➕ Arithmetic operators
+             * ➕ Arithmetic expressions
              */
             [
                 'total add 5 eq 100',
@@ -181,7 +178,7 @@ final readonly class ChatGPTFuzzyTestProvider
             ['((count mod 5) divby 2) eq 1'],
 
             /**
-             * ⚖️ Comparisons combined with arithmetic operators
+             * ⚖️ Comparison expressions combined with arithmetic expressions
              */
             [
                 'price add tax sub discount eq total',
@@ -304,7 +301,7 @@ final readonly class ChatGPTFuzzyTestProvider
             ['active has true'],
 
             /**
-             * 🔀 'in' and 'has' operators combined
+             * 🔀 'in' and 'has' expressions combined
              */
             [
                 'roles has \'admin\' and status in (\'active\', \'pending\')',
@@ -366,7 +363,7 @@ final readonly class ChatGPTFuzzyTestProvider
             ['createdAt eq \'2023-12-01T00:00:00Z\''],
 
             /**
-             * 🛠️ Combined and nested operators
+             * 🛠️ Combined and nested expressions
              */
             [
                 '((price add 10) div 2) mod 3 eq 1 and not available eq false',

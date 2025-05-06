@@ -81,7 +81,6 @@ enum TokenKind
     public static function fromArithmeticOperator(ArithmeticOperator $arithmeticOperator): self
     {
         return match ($arithmeticOperator) {
-            ArithmeticOperator::minus => self::Minus,
             ArithmeticOperator::mul => self::Mul,
             ArithmeticOperator::div => self::Div,
             ArithmeticOperator::divBy => self::DivBy,

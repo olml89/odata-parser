@@ -7,9 +7,9 @@ namespace Tests\Integration\Parser\DataProvider;
 use olml89\ODataParser\Lexer\Keyword\FunctionName;
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\TokenKind;
+use olml89\ODataParser\Parser\Exception\ArgumentCountException;
 use olml89\ODataParser\Parser\Exception\ParserException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
-use olml89\ODataParser\Parser\Node\Function\ArgumentCountException;
 
 final readonly class SintacticallyInvalidInputAndParseExpressionProvider
 {

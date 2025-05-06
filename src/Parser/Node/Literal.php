@@ -4,23 +4,27 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Parser\Node;
 
-use olml89\ODataParser\Lexer\Keyword\TypeConstant;
-use olml89\ODataParser\Parser\Node\Value\Value;
+use olml89\ODataParser\Parser\Node\Value\Scalar;
+use olml89\ODataParser\SemanticAnalyzer\Visitor;
 
-final readonly class Literal implements Node
+final class Literal implements Node
 {
+    public NodeType $type {
+        get => NodeType::Literal;
+    }
+
     public function __construct(
-        public ?Value $value,
+        public readonly Scalar $value,
     ) {
     }
 
-    public function isPrimary(): bool
+    public function accept(Visitor $visitor): mixed
     {
-        return true;
+        return $visitor->visitLiteral($this);
     }
 
     public function __toString(): string
     {
-        return is_null($this->value) ? TypeConstant::null->value : (string)$this->value;
+        return (string)$this->value;
     }
 }

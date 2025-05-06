@@ -4,17 +4,27 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Parser\Node;
 
-final readonly class Property implements Node
+use olml89\ODataParser\Parser\Node\Value\StringValue;
+use olml89\ODataParser\SemanticAnalyzer\Visitor;
+
+final class Property implements Node
 {
+    public NodeType $type {
+        get => NodeType::Property;
+    }
+
     public function __construct(
-        public string $name,
-        public ?Property $subProperty = null,
+        public readonly StringValue $name,
+        public readonly ?Property $subProperty = null,
     ) {
     }
 
-    public function isPrimary(): bool
+    public static function from(string $name, ?Property $subProperty = null): self
     {
-        return true;
+        return new self(
+            new StringValue($name),
+            $subProperty,
+        );
     }
 
     public function addSubProperty(Property $property): self
@@ -32,10 +42,15 @@ final readonly class Property implements Node
         );
     }
 
+    public function accept(Visitor $visitor): mixed
+    {
+        return $visitor->visitProperty($this);
+    }
+
     public function __toString(): string
     {
         return is_null($this->subProperty)
-            ? $this->name
-            : sprintf('%s/%s', $this->name, $this->subProperty);
+            ? $this->name->value()
+            : sprintf('%s/%s', $this->name->value(), $this->subProperty);
     }
 }

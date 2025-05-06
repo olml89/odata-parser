@@ -5,11 +5,20 @@ declare(strict_types=1);
 namespace olml89\ODataParser\Parser\Node\Function;
 
 use olml89\ODataParser\Lexer\Keyword\FunctionName;
+use olml89\ODataParser\SemanticAnalyzer\Visitor;
 
-final readonly class Concat extends BinaryFunction implements FunctionNode
+final class Concat implements FunctionExpression
 {
-    public static function name(): FunctionName
+    use IsBinaryFunction;
+    use IsStringFunction;
+
+    protected static function name(): FunctionName
     {
         return FunctionName::concat;
+    }
+
+    public function accept(Visitor $visitor): mixed
+    {
+        return $visitor->visitConcat($this);
     }
 }

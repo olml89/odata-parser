@@ -5,11 +5,19 @@ declare(strict_types=1);
 namespace olml89\ODataParser\Parser\Node\Function;
 
 use olml89\ODataParser\Lexer\Keyword\FunctionName;
+use olml89\ODataParser\SemanticAnalyzer\Visitor;
 
-final readonly class Length extends UnaryFunction implements FunctionNode
+final class Length implements FunctionExpression
 {
-    public static function name(): FunctionName
+    use IsUnaryFunction;
+
+    protected static function name(): FunctionName
     {
         return FunctionName::length;
+    }
+
+    public function accept(Visitor $visitor): mixed
+    {
+        return $visitor->visitLength($this);
     }
 }

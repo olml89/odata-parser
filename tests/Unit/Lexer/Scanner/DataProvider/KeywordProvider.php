@@ -30,7 +30,6 @@ final readonly class KeywordProvider
             /**
              * Arithmetic operators
              */
-            ['-'],
             ['mul'],
             ['divby'],
             ['div'],

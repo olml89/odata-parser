@@ -36,17 +36,29 @@ final readonly class LiteralTokensProvider implements InputAndExpectedTokensProv
                 '12',
                 new ValueToken(TokenKind::Number, '12'),
             ],
+            'negative int' => [
+                '-12',
+                new ValueToken(TokenKind::Number, '-12'),
+            ],
             'float' => [
                 '12.1564',
                 new ValueToken(TokenKind::Number, '12.1564'),
             ],
+            'negative float' => [
+                '-12.1564',
+                new ValueToken(TokenKind::Number, '-12.1564'),
+            ],
             'string between simple quotes' => [
-                "'Little John'",
+                '\'Little John\'',
                 new ValueToken(TokenKind::String, 'Little John'),
             ],
             'string between double quotes' => [
                 '"Little John"',
                 new ValueToken(TokenKind::String, 'Little John'),
+            ],
+            'string with a hyphen' => [
+                '\'Little-John\'',
+                new ValueToken(TokenKind::String, 'Little-John'),
             ],
         ];
     }

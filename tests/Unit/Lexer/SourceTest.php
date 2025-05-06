@@ -193,78 +193,115 @@ final class SourceTest extends TestCase
         $source->peek();
     }
 
-    public function testConsumeAlpha(): void
+    /**
+     * @return array<string, array{0: Source, 1: ?string, 2: ?Char}>
+     */
+    public static function provideSourceAndExpectedAlphaAndPeek(): array
     {
-        $alpha = 'abcde';
-        $sourceWithoutAlpha = new Source('3.1416');
-        $sourceWithAlpha = new Source($alpha . '3.1416');
-
-        $this->assertNull($sourceWithoutAlpha->consumeAlpha());
-
-        $this->assertEquals(
-            $alpha,
-            $sourceWithAlpha->consumeAlpha(),
-        );
-        $this->assertEquals(
-            new Char('3', 5),
-            $sourceWithAlpha->peek(),
-        );
+        return [
+            'not alpha' => [
+                new Source('3.1416'),
+                null,
+                null,
+            ],
+            'alpha' => [
+                new Source('abcde3.1416'),
+                'abcde',
+                new Char('3', 5),
+            ],
+        ];
     }
 
-    public function testConsumeNumeric(): void
+    #[DataProvider('provideSourceAndExpectedAlphaAndPeek')]
+    public function testConsumeAlpha(Source $source, ?string $expectedAlpha, ?Char $expectedPeek): void
     {
-        $integer = '12';
-        $float = '3.1416';
-        $sourceWithoutNumeric = new Source('abcde');
-        $sourceWithInteger = new Source($integer . 'abcde');
-        $sourceWithFloat = new Source($float . 'abcde');
+        $this->assertEquals($expectedAlpha, $source->consumeAlpha());
 
-        $this->assertNull($sourceWithoutNumeric->consumeNumeric());
-
-        $this->assertEquals(
-            $integer,
-            $sourceWithInteger->consumeNumeric(),
-        );
-        $this->assertEquals(
-            new Char('a', 2),
-            $sourceWithInteger->peek(),
-        );
-
-        $this->assertEquals(
-            $float,
-            $sourceWithFloat->consumeNumeric(),
-        );
-        $this->assertEquals(
-            new Char('a', 6),
-            $sourceWithFloat->peek(),
-        );
+        if (!is_null($expectedPeek)) {
+            $this->assertEquals($expectedPeek, $source->peek());
+        }
     }
 
-    public function testConsumeString(): void
+    /**
+     * @return array<string, array{0: Source, 1: ?string, 2: ?Char}>
+     */
+    public static function provideSourceAndExpectedNumericAndPeek(): array
     {
-        $string = 'abcde';
-        $sourceWithoutString = new Source('xyz');
-        $sourceWithStringBetweenSingleQuotes = new Source('\'' . $string .'\'' . 'xyz');
-        $sourceWithStringBetweenDoubleQuotes = new Source('"' . $string .'"' . 'xyz');
+        return [
+            'not numeric' => [
+                new Source('abcde'),
+                null,
+                null,
+            ],
+            'integer' => [
+                new Source('12abcde'),
+                '12',
+                new Char('a', 2),
+            ],
+            'negative integer' => [
+                new Source('-12abcde'),
+                '-12',
+                new Char('a', 3),
+            ],
+            'float' => [
+                new Source('3.1416abcde'),
+                '3.1416',
+                new Char('a', 6),
+            ],
+            'negative float' => [
+                new Source('-3.1416abcde'),
+                '-3.1416',
+                new Char('a', 7),
+            ],
+        ];
+    }
 
-        $this->assertNull($sourceWithoutString->consumeString());
+    #[DataProvider('provideSourceAndExpectedNumericAndPeek')]
+    public function testConsumeNumeric(Source $source, ?string $expectedNumeric, ?Char $expectedPeek): void
+    {
+        $this->assertEquals($expectedNumeric, $source->consumeNumeric());
 
-        $this->assertEquals(
-            $string,
-            $sourceWithStringBetweenSingleQuotes->consumeString(),
-        );
-        $this->assertEquals(
-            new Char('x', 7),
-            $sourceWithStringBetweenSingleQuotes->peek(),
-        );
+        if (!is_null($expectedPeek)) {
+            $this->assertEquals($expectedPeek, $source->peek());
+        }
+    }
 
-        $this->assertEquals(
-            $string,
-            $sourceWithStringBetweenDoubleQuotes->consumeString(),
-        );
-        $this->assertEquals(
-            new Char('x', 7),
-            $sourceWithStringBetweenDoubleQuotes->peek(),
-        );
+    /**
+     * @return array<string, array{0: Source, 1: ?string, 2: ?Char}>
+     */
+    public static function provideSourceAndExpectedStringAndPeek(): array
+    {
+        return [
+            'no string' => [
+                new Source('abcde'),
+                null,
+                null,
+            ],
+            'string between single quotes' => [
+                new Source('\'xyz\'abcde'),
+                'xyz',
+                new Char('a', 5),
+            ],
+            'string between double quotes' => [
+                new Source('"xyz"abcde'),
+                'xyz',
+                new Char('a', 5),
+            ],
+            'string with hyphen' => [
+                new Source('\'vw-xyz\''),
+                'vw-xyz',
+                null,
+            ],
+        ];
+    }
+
+    #[DataProvider('provideSourceAndExpectedStringAndPeek')]
+    public function testConsumeString(Source $source, ?string $expectedString, ?Char $expectedPeek): void
+    {
+        $this->assertEquals($expectedString, $source->consumeString());
+
+        if (!is_null($expectedPeek)) {
+            $this->assertEquals($expectedPeek, $source->peek());
+        }
     }
 }

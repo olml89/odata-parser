@@ -10,10 +10,10 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\All;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Any;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThan;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\All;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Any;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Equal;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\GreaterThan;
 use olml89\ODataParser\Parser\Node\Property;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
@@ -28,10 +28,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
         return [
             'any accessing entities' => [
                 new Any(
-                    property: new Property('tags'),
-                    variable: new Property('t'),
+                    property: Property::from('tags'),
+                    variable: Property::from('t'),
                     predicate: new Equal(
-                        new Property('t'),
+                        Property::from('t'),
                         new Literal(new StringValue('yes')),
                     )
                 ),
@@ -48,10 +48,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
             ],
             'any accessing entity properties' => [
                 new Any(
-                    property: new Property('orders'),
-                    variable: new Property('o'),
+                    property: Property::from('orders'),
+                    variable: Property::from('o'),
                     predicate: new GreaterThan(
-                        new Property('o', new Property('amount')),
+                        Property::from('o', Property::from('amount')),
                         new Literal(new IntValue(100)),
                     )
                 ),
@@ -70,10 +70,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
             ],
             'any accessing nested entity properties' => [
                 new Any(
-                    property: new Property('order', new Property('items')),
-                    variable: new Property('i'),
+                    property: Property::from('order', Property::from('items')),
+                    variable: Property::from('i'),
                     predicate: new GreaterThan(
-                        new Property('i', new Property('invoice', new Property('amount'))),
+                        Property::from('i', Property::from('invoice', Property::from('amount'))),
                         new Literal(new IntValue(100)),
                     )
                 ),
@@ -96,10 +96,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
             ],
             'all accessing entities' => [
                 new All(
-                    property: new Property('tags'),
-                    variable: new Property('t'),
+                    property: Property::from('tags'),
+                    variable: Property::from('t'),
                     predicate: new Equal(
-                        new Property('t'),
+                        Property::from('t'),
                         new Literal(new StringValue('yes')),
                     )
                 ),
@@ -116,10 +116,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
             ],
             'all accessing entity properties' => [
                 new All(
-                    property: new Property('orders'),
-                    variable: new Property('o'),
+                    property: Property::from('orders'),
+                    variable: Property::from('o'),
                     predicate: new GreaterThan(
-                        new Property('o', new Property('amount')),
+                        Property::from('o', Property::from('amount')),
                         new Literal(new IntValue(100)),
                     )
                 ),
@@ -138,10 +138,10 @@ final readonly class CollectionProvider implements NodeAndExpectedTokensProvider
             ],
             'all accessing nested entity properties' => [
                 new All(
-                    property: new Property('order', new Property('items')),
-                    variable: new Property('i'),
+                    property: Property::from('order', Property::from('items')),
+                    variable: Property::from('i'),
                     predicate: new GreaterThan(
-                        new Property('i', new Property('invoice', new Property('amount'))),
+                        Property::from('i', Property::from('invoice', Property::from('amount'))),
                         new Literal(new IntValue(100)),
                     )
                 ),

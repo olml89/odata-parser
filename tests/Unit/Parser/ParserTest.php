@@ -9,27 +9,31 @@ use olml89\ODataParser\Lexer\Token\Token;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Parser\Exception\TokenOutOfBoundsException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
-use olml89\ODataParser\Parser\Node\Function\BinaryFunction;
-use olml89\ODataParser\Parser\Node\Function\TernaryFunction;
-use olml89\ODataParser\Parser\Node\Function\UnaryFunction;
+use olml89\ODataParser\Parser\Node\Function\IsBinaryFunction;
+use olml89\ODataParser\Parser\Node\Function\IsStringFunction;
+use olml89\ODataParser\Parser\Node\Function\Substring;
+use olml89\ODataParser\Parser\Node\Function\IsTernaryFunction;
+use olml89\ODataParser\Parser\Node\Function\IsUnaryFunction;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\BinaryOperator;
-use olml89\ODataParser\Parser\Node\Operator\CollectionLambdaOperator;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\In;
-use olml89\ODataParser\Parser\Node\Operator\UnaryOperator;
+use olml89\ODataParser\Parser\Node\Expression\IsBinaryExpression;
+use olml89\ODataParser\Parser\Node\Expression\IsCollectionLambdaExpression;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\In;
+use olml89\ODataParser\Parser\Node\Expression\IsUnaryExpression;
 use olml89\ODataParser\Parser\Node\Property;
-use olml89\ODataParser\Parser\Node\Value\BooleanValue;
+use olml89\ODataParser\Parser\Node\Value\BoolValue;
+use olml89\ODataParser\Parser\Node\Value\NullValue;
+use olml89\ODataParser\Parser\Node\Value\ScalarCaster;
 use olml89\ODataParser\Parser\Node\Value\FloatValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
-use olml89\ODataParser\Parser\Node\Value\Value;
 use olml89\ODataParser\Parser\Parser;
 use olml89\ODataParser\Parser\TokenManager;
 use olml89\ODataParser\Parser\TokenWrapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProviderExternal;
 use PHPUnit\Framework\Attributes\UsesClass;
+use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Parser\DataProvider\ArithmeticProvider;
 use Tests\Unit\Parser\DataProvider\CollectionProvider;
@@ -40,26 +44,29 @@ use Tests\Unit\Parser\DataProvider\PrimaryProvider;
 use Tests\Unit\Parser\DataProvider\SubExpressionProvider;
 
 #[CoversClass(Parser::class)]
-#[UsesClass(BinaryFunction::class)]
-#[UsesClass(BinaryOperator::class)]
-#[UsesClass(BooleanValue::class)]
-#[UsesClass(CollectionLambdaOperator::class)]
+#[UsesClass(BoolValue::class)]
+#[UsesClass(ScalarCaster::class)]
 #[UsesClass(FloatValue::class)]
 #[UsesClass(In::class)]
 #[UsesClass(IntValue::class)]
 #[UsesClass(Literal::class)]
+#[UsesClass(NullValue::class)]
 #[UsesClass(OperatorToken::class)]
 #[UsesClass(Property::class)]
-#[UsesClass(TernaryFunction::class)]
 #[UsesClass(TokenManager::class)]
 #[UsesClass(TokenKind::class)]
 #[UsesClass(TokenWrapper::class)]
-#[UsesClass(UnaryFunction::class)]
-#[UsesClass(UnaryOperator::class)]
 #[UsesClass(UnexpectedTokenException::class)]
-#[UsesClass(Value::class)]
 #[UsesClass(StringValue::class)]
+#[UsesClass(Substring::class)]
 #[UsesClass(TokenOutOfBoundsException::class)]
+#[UsesTrait(IsBinaryExpression::class)]
+#[UsesTrait(IsBinaryFunction::class)]
+#[UsesTrait(IsCollectionLambdaExpression::class)]
+#[UsesTrait(IsStringFunction::class)]
+#[UsesTrait(IsTernaryFunction::class)]
+#[UsesTrait(IsUnaryFunction::class)]
+#[UsesTrait(IsUnaryExpression::class)]
 final class ParserTest extends TestCase
 {
     public function testItParsesEmptyTokensAsNull(): void

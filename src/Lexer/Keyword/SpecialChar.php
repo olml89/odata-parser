@@ -13,6 +13,7 @@ enum SpecialChar: string implements Keyword
     case DoubleQuote = '"';
     case Comma = ',';
     case Dot = '.';
+    case Minus = '-';
     case Colon = ':';
     case Slash = '/';
 

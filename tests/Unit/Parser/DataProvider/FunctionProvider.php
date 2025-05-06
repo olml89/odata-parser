@@ -35,7 +35,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
         return [
             'concat' => [
                 new Concat(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -46,7 +46,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'contains' => [
                 new Contains(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -57,7 +57,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'endswith' => [
                 new EndsWith(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -68,7 +68,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'indexof' => [
                 new IndexOf(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -79,7 +79,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'length' => [
                 new Length(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                 ),
                 ...self::createUnaryFunctionTokens(
                     functionName: 'length',
@@ -88,7 +88,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'matchesPattern' => [
                 new MatchesPattern(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -99,7 +99,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'startswith' => [
                 new StartsWith(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new StringValue('abcde')),
                 ),
                 ...self::createBinaryFunctionTokens(
@@ -110,7 +110,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'substring' => [
                 new Substring(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                     new Literal(new IntValue(2)),
                     new Literal(new IntValue(4)),
                 ),
@@ -137,7 +137,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'tolower' => [
                 new ToLower(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                 ),
                 ...self::createUnaryFunctionTokens(
                     functionName: 'tolower',
@@ -146,7 +146,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'toupper' => [
                 new ToUpper(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                 ),
                 ...self::createUnaryFunctionTokens(
                     functionName: 'toupper',
@@ -155,7 +155,7 @@ final readonly class FunctionProvider implements NodeAndExpectedTokensProvider
             ],
             'trim' => [
                 new Trim(
-                    new Property('identifier'),
+                    Property::from('identifier'),
                 ),
                 ...self::createUnaryFunctionTokens(
                     functionName: 'trim',

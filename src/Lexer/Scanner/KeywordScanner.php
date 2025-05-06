@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace olml89\ODataParser\Lexer\Scanner;
 
+use olml89\ODataParser\Lexer\Exception\CharOutOfBoundsException;
 use olml89\ODataParser\Lexer\Keyword\ArithmeticOperator;
 use olml89\ODataParser\Lexer\Keyword\CollectionOperator;
 use olml89\ODataParser\Lexer\Keyword\ComparisonOperator;
@@ -19,13 +20,16 @@ final readonly class KeywordScanner implements Scanner
 {
     use IsScanner;
 
+    /**
+     * @throws CharOutOfBoundsException
+     */
     public function scan(): ?Token
     {
         /**
          * In OData, the order of precedence for operators from top to bottom is:
          * 1) Parentheses
          * 2) Functions
-         * 3) Arithmetical operators (mul, div, mod), (add, sub)
+         * 3) Arithmetical operators (mul, div, mod), (add, sub), minus (-)
          * 4) Comparison operators
          * 5) Logical operator NOT
          * 6) Logical operator AND

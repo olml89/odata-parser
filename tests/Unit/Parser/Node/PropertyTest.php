@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Tests\Unit\Parser\Node;
 
 use olml89\ODataParser\Parser\Node\Property;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Property::class)]
+#[CoversMethod(Property::class, 'addSubProperty')]
+#[UsesClass(Property::class)]
 final class PropertyTest extends TestCase
 {
     /**
@@ -19,34 +21,34 @@ final class PropertyTest extends TestCase
     {
         return [
             [
-                new Property('a'),
-                new Property('b'),
-                new Property(
+                Property::from('a'),
+                Property::from('b'),
+                Property::from(
                     'a',
-                    new Property('b'),
+                    Property::from('b'),
                 ),
             ],
             [
-                new Property(
+                Property::from(
                     'a',
-                    new Property(
+                    Property::from(
                         'b',
-                        new Property(
+                        Property::from(
                             'c',
-                            new Property('d'),
+                            Property::from('d'),
                         )
                     ),
                 ),
-                new Property('e'),
-                new Property(
+                Property::from('e'),
+                Property::from(
                     'a',
-                    new Property(
+                    Property::from(
                         'b',
-                        new Property(
+                        Property::from(
                             'c',
-                            new Property(
+                            Property::from(
                                 'd',
-                                new Property('e'),
+                                Property::from('e'),
                             ),
                         )
                     ),

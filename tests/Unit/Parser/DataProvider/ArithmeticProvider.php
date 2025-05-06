@@ -10,13 +10,13 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Add;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Div;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\DivBy;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Minus;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mod;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mul;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Sub;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Add;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Div;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\DivBy;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Minus;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Mod;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Mul;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Sub;
 use olml89\ODataParser\Parser\Node\Property;
 use olml89\ODataParser\Parser\Node\Value\FloatValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
@@ -40,7 +40,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'mul' => [
                 new Mul(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createBinaryOperatorTokens(
@@ -51,7 +51,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'div' => [
                 new Div(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createBinaryOperatorTokens(
@@ -62,7 +62,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'divBy' => [
                 new DivBy(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new FloatValue(2.5)),
                 ),
                 ...self::createBinaryOperatorTokens(
@@ -73,7 +73,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'mod' => [
                 new Mod(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createBinaryOperatorTokens(
@@ -84,7 +84,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'add' => [
                 new Add(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createBinaryOperatorTokens(
@@ -95,7 +95,7 @@ final readonly class ArithmeticProvider implements NodeAndExpectedTokensProvider
             ],
             'sub' => [
                 new Sub(
-                    new Property('quantity'),
+                    Property::from('quantity'),
                     new Literal(new IntValue(2)),
                 ),
                 ...self::createBinaryOperatorTokens(

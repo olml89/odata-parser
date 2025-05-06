@@ -19,10 +19,11 @@ use olml89\ODataParser\Lexer\Source;
 use olml89\ODataParser\Lexer\Token\OperatorToken;
 use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
+use olml89\ODataParser\Parser\Exception\ArgumentCountException;
 use olml89\ODataParser\Parser\Exception\ParserException;
 use olml89\ODataParser\Parser\Exception\UnexpectedTokenException;
-use olml89\ODataParser\Parser\Node\Function\ArgumentCountException;
-use olml89\ODataParser\Parser\Node\Function\BinaryFunction;
+use olml89\ODataParser\Parser\Node\Expression\IsUnaryExpression;
+use olml89\ODataParser\Parser\Node\Function\IsBinaryFunction;
 use olml89\ODataParser\Parser\Node\Function\Contains;
 use olml89\ODataParser\Parser\Node\Function\EndsWith;
 use olml89\ODataParser\Parser\Node\Function\IndexOf;
@@ -33,38 +34,34 @@ use olml89\ODataParser\Parser\Node\Function\Substring;
 use olml89\ODataParser\Parser\Node\Function\ToLower;
 use olml89\ODataParser\Parser\Node\Function\ToUpper;
 use olml89\ODataParser\Parser\Node\Function\Trim;
-use olml89\ODataParser\Parser\Node\Function\UnaryFunction;
+use olml89\ODataParser\Parser\Node\Function\IsUnaryFunction;
 use olml89\ODataParser\Parser\Node\Literal;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Add;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Div;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\DivBy;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\HasHighPreference;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\HasLowPreference;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\IsArithmetic;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mod;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Mul;
-use olml89\ODataParser\Parser\Node\Operator\Arithmetic\Sub;
-use olml89\ODataParser\Parser\Node\Operator\BinaryOperator;
-use olml89\ODataParser\Parser\Node\Operator\CollectionLambdaOperator;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\All;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Any;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThan;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\GreaterThanOrEqual;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Has;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\In;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\LessThan;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\LessThanOrEqual;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\NotEqual;
-use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
-use olml89\ODataParser\Parser\Node\Operator\Logical\NotOperator;
-use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Add;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Div;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\DivBy;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Mod;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Mul;
+use olml89\ODataParser\Parser\Node\Expression\Arithmetic\Sub;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\All;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Any;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Equal;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\GreaterThan;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\GreaterThanOrEqual;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Has;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\In;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\LessThan;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\LessThanOrEqual;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\NotEqual;
+use olml89\ODataParser\Parser\Node\Expression\Logical\AndExpression;
+use olml89\ODataParser\Parser\Node\Expression\Logical\NotExpression;
+use olml89\ODataParser\Parser\Node\Expression\Logical\OrExpression;
 use olml89\ODataParser\Parser\Node\Property;
-use olml89\ODataParser\Parser\Node\Value\BooleanValue;
+use olml89\ODataParser\Parser\Node\Value\BoolValue;
+use olml89\ODataParser\Parser\Node\Value\ScalarCaster;
 use olml89\ODataParser\Parser\Node\Value\FloatValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
+use olml89\ODataParser\Parser\Node\Value\NullValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
-use olml89\ODataParser\Parser\Node\Value\Value;
 use olml89\ODataParser\Parser\Parser;
 use olml89\ODataParser\Parser\TokenManager;
 use olml89\ODataParser\Parser\TokenWrapper;
@@ -81,14 +78,12 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[CoversClass(Parser::class)]
 #[UsesClass(Add::class)]
 #[UsesClass(All::class)]
+#[UsesClass(AndExpression::class)]
 #[UsesClass(Any::class)]
-#[UsesClass(AndOperator::class)]
 #[UsesClass(ArgumentCountException::class)]
-#[UsesClass(BinaryFunction::class)]
-#[UsesClass(BinaryOperator::class)]
-#[UsesClass(BooleanValue::class)]
+#[UsesClass(BoolValue::class)]
+#[UsesClass(ScalarCaster::class)]
 #[UsesClass(Char::class)]
-#[UsesClass(CollectionLambdaOperator::class)]
 #[UsesClass(Contains::class)]
 #[UsesClass(Div::class)]
 #[UsesClass(DivBy::class)]
@@ -111,10 +106,11 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[UsesClass(Mul::class)]
 #[UsesClass(Mod::class)]
 #[UsesClass(NotEqual::class)]
-#[UsesClass(NotOperator::class)]
+#[UsesClass(NotExpression::class)]
+#[UsesClass(NullValue::class)]
 #[UsesClass(NumericScanner::class)]
 #[UsesClass(OperatorToken::class)]
-#[UsesClass(OrOperator::class)]
+#[UsesClass(OrExpression::class)]
 #[UsesClass(Property::class)]
 #[UsesClass(ScannerPipeline::class)]
 #[UsesClass(Source::class)]
@@ -132,14 +128,12 @@ use Tests\Integration\Parser\DataProvider\SintacticallyInvalidInputAndParseExpre
 #[UsesClass(ToUpper::class)]
 #[UsesClass(Trim::class)]
 #[UsesClass(UnexpectedTokenException::class)]
-#[UsesClass(Value::class)]
 #[UsesClass(ValueToken::class)]
-#[UsesClass(UnaryFunction::class)]
-#[UsesTrait(HasHighPreference::class)]
-#[UsesTrait(HasLowPreference::class)]
-#[UsesTrait(IsArithmetic::class)]
+#[UsesTrait(IsBinaryFunction::class)]
 #[UsesTrait(IsNotChar::class)]
 #[UsesTrait(IsScanner::class)]
+#[UsesTrait(IsUnaryFunction::class)]
+#[UsesTrait(IsUnaryExpression::class)]
 final class ParserTest extends TestCase
 {
     #[DataProviderExternal(SintacticallyInvalidInputAndParseExpressionProvider::class, 'provide')]

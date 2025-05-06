@@ -28,6 +28,11 @@ final readonly class Char implements Stringable
         return ctype_alpha($this->char);
     }
 
+    public function isNumeric(): bool
+    {
+        return $this->isDigit() || $this->equals(SpecialChar::Minus, SpecialChar::Dot);
+    }
+
     public function equals(SpecialChar ...$specialChars): bool
     {
         return array_any(

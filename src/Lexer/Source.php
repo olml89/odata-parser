@@ -39,9 +39,9 @@ final class Source
         $this->position += $positions;
     }
 
-    private function substring(int $start, int $length): string
+    private function substring(int $start, ?int $length): ?string
     {
-        return mb_substr($this->text, start: $start, length: $length);
+        return $length === 0 ? null : mb_substr($this->text, start: $start, length: $length);
     }
 
     private function charAt(int $position): ?Char
@@ -56,14 +56,24 @@ final class Source
      */
     public function peek(): Char
     {
-        return $this->charAt($this->position) ?? throw new CharOutOfBoundsException($this->position, $this->length());
+        return $this->tryPeek() ?? throw new CharOutOfBoundsException($this->position, $this->length());
+    }
+
+    private function tryPeek(): ?Char
+    {
+        return $this->charAt($this->position);
+    }
+
+    private function tryNext(): ?Char
+    {
+        return $this->charAt($this->position + 1);
     }
 
     private function keywordMatches(Keyword $keyword): bool
     {
         $currentSubstring = $this->substring(start: $this->position, length: mb_strlen($keyword->value));
 
-        if (mb_strtolower($currentSubstring) !== mb_strtolower($keyword->value)) {
+        if (is_null($currentSubstring) || (mb_strtolower($currentSubstring) !== mb_strtolower($keyword->value))) {
             return false;
         }
 
@@ -73,7 +83,13 @@ final class Source
          * operators, functions...
          */
         if ($keyword instanceof SpecialChar) {
-            return true;
+
+            /**
+             * Minus (-) have to be evaluated apart because if (-) is part of a numeric expression, it must be parsed as
+             * part of a negative number, but if it precedes everything else, (including end of string, although that's
+             * an invalid AST but that's a problem for the parser), it should be parsed as a Minus operator.
+             */
+            return $keyword !== SpecialChar::Minus || !(($this->tryNext()?->isNumeric()) ?? false);
         }
 
         /**
@@ -109,7 +125,7 @@ final class Source
          *  * true,     -> it is a literal true token and a comma token
          *  * trueBlood -> it is a literal string token with value 'trueBlood'
          *
-         * In this case, i there's no char left after the match, we have reached the end of the string, so technically
+         * In this case, if there's no char left after the match, we have reached the end of the string, so technically
          * we have found a valid keyword, although it is probably syntactically invalid unless it is close
          * parentheses. But that's a problem for the parser.
          */
@@ -132,12 +148,9 @@ final class Source
         return $found;
     }
 
-    /**
-     * @throws CharOutOfBoundsException
-     */
     public function consumeWhiteSpaces(): void
     {
-        while (!$this->eof() && $this->peek()->equals(SpecialChar::WhiteSpace)) {
+        while ($this->tryPeek()?->equals(SpecialChar::WhiteSpace)) {
             $this->advance();
         }
     }
@@ -147,13 +160,9 @@ final class Source
      */
     public function consumeAlpha(): ?string
     {
-        if (!$this->peek()->isAlpha()) {
-            return null;
-        }
-
         $start = $this->position;
 
-        while (!$this->eof() && $this->peek()->isAlpha()) {
+        while ($this->tryPeek()?->isAlpha()) {
             $this->advance();
         }
 
@@ -165,16 +174,9 @@ final class Source
      */
     public function consumeNumeric(): ?string
     {
-        $char = $this->peek();
-        $nextChar = $this->charAt($this->position + 1);
-
-        if (!$char->isDigit() && !($char->equals(SpecialChar::Dot) && $nextChar?->isDigit())) {
-            return null;
-        }
-
         $start = $this->position;
 
-        while (!$this->eof() && ($this->peek()->isDigit() || $this->peek()->equals(SpecialChar::Dot))) {
+        while ($this->tryPeek()?->isNumeric()) {
             $this->advance();
         }
 
@@ -196,12 +198,12 @@ final class Source
         $this->advance();
         $start = $this->position;
 
-        while (!$this->eof() && !$this->peek()->equals($delimiter)) {
+        while (!is_null($peek = $this->tryPeek()) && !$peek->equals($delimiter)) {
             $this->advance();
         }
 
         if ($this->eof()) {
-            throw new UnterminatedStringException();
+            throw new UnterminatedStringException($this->text);
         }
 
         $string = $this->substring(start: $start, length: $this->position - $start);

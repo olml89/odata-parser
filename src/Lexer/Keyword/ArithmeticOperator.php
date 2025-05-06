@@ -8,7 +8,6 @@ enum ArithmeticOperator: string implements Keyword
 {
     use IsNotChar;
 
-    case minus = '-';
     case mul = 'mul';
     /**
      * Load divBy first as div is a substring of divBy and would be a false positive

@@ -10,12 +10,12 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\NotEqual;
-use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
-use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Equal;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\NotEqual;
+use olml89\ODataParser\Parser\Node\Expression\Logical\AndExpression;
+use olml89\ODataParser\Parser\Node\Expression\Logical\OrExpression;
 use olml89\ODataParser\Parser\Node\Property;
-use olml89\ODataParser\Parser\Node\Value\BooleanValue;
+use olml89\ODataParser\Parser\Node\Value\BoolValue;
 use olml89\ODataParser\Parser\Node\Value\IntValue;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
 
@@ -29,20 +29,20 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
         return [
             'and takes precedence (evaluated first, inner) on nested ands and ors at the beginning of the 
             expression' => [
-                new OrOperator(
-                    new AndOperator(
+                new OrExpression(
+                    new AndExpression(
                         new Equal(
-                            new Property('name'),
+                            Property::from('name'),
                             new Literal(new StringValue('John Smith')),
                         ),
                         new Equal(
-                            new Property('quantity'),
+                            Property::from('quantity'),
                             new Literal(new IntValue(2)),
                         ),
                     ),
                     new NotEqual(
-                        new Property('accepted'),
-                        new Literal(new BooleanValue(true)),
+                        Property::from('accepted'),
+                        new Literal(new BoolValue(true)),
                     ),
                 ),
                 new OperatorToken(TokenKind::OpenParen),
@@ -61,19 +61,19 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
             ],
             'or takes precedence (evaluated first, inner) on nested ands and ors at the beginning of the expression 
             if indicated by parentheses' => [
-                new AndOperator(
+                new AndExpression(
                     new Equal(
-                        new Property('name'),
+                        Property::from('name'),
                         new Literal(new StringValue('John Smith')),
                     ),
-                    new OrOperator(
+                    new OrExpression(
                         new Equal(
-                            new Property('quantity'),
+                            Property::from('quantity'),
                             new Literal(new IntValue(2)),
                         ),
                         new NotEqual(
-                            new Property('accepted'),
-                            new Literal(new BooleanValue(true)),
+                            Property::from('accepted'),
+                            new Literal(new BoolValue(true)),
                         ),
                     ),
                 ),
@@ -94,20 +94,20 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
                 new OperatorToken(TokenKind::CloseParen),
             ],
             'and takes precedence (evaluated first, inner) on nested ands and ors at the middle of the expression' => [
-                new OrOperator(
-                    new AndOperator(
+                new OrExpression(
+                    new AndExpression(
                         new Equal(
-                            new Property('name'),
+                            Property::from('name'),
                             new Literal(new StringValue('John Smith')),
                         ),
                         new Equal(
-                            new Property('quantity'),
+                            Property::from('quantity'),
                             new Literal(new IntValue(2)),
                         ),
                     ),
                     new NotEqual(
-                        new Property('accepted'),
-                        new Literal(new BooleanValue(true)),
+                        Property::from('accepted'),
+                        new Literal(new BoolValue(true)),
                     ),
                 ),
                 new ValueToken(TokenKind::Identifier, 'name', ),
@@ -124,19 +124,19 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
             ],
             'or takes precedence (evaluated first, inner) on nested ands and ors at the middle of the expression if 
             indicated by parentheses' => [
-                new AndOperator(
+                new AndExpression(
                     new Equal(
-                        new Property('name'),
+                        Property::from('name'),
                         new Literal(new StringValue('John Smith')),
                     ),
-                    new OrOperator(
+                    new OrExpression(
                         new Equal(
-                            new Property('quantity'),
+                            Property::from('quantity'),
                             new Literal(new IntValue(2)),
                         ),
                         new NotEqual(
-                            new Property('accepted'),
-                            new Literal(new BooleanValue(true)),
+                            Property::from('accepted'),
+                            new Literal(new BoolValue(true)),
                         ),
                     ),
                 ),
@@ -155,12 +155,12 @@ final readonly class SubExpressionProvider implements NodeAndExpectedTokensProvi
                 new OperatorToken(TokenKind::CloseParen),
             ],
             'redundant boolean comparison' => [
-                new AndOperator(
+                new AndExpression(
                     new Equal(
-                        new Property('active'),
-                        new Literal(new BooleanValue(true)),
+                        Property::from('active'),
+                        new Literal(new BoolValue(true)),
                     ),
-                    new Property('active'),
+                    Property::from('active'),
                 ),
                 new ValueToken(TokenKind::Identifier, 'active', ),
                 new OperatorToken(TokenKind::Equal),

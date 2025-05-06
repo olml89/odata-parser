@@ -37,18 +37,28 @@ $query = \olml89\ODataParser\ODataUriParser::parse($queryString);
 
 If the query string is not lexically valid (for example, it contains unknown keywords), a 
 `LexerException` 
-will be thrown.
+will be thrown:
+- `CharOutOfBoundsException`
+- `InvalidTokenException`
+- `UnterminatedStringException`
 
 If the tokens for the query are valid, but they represent a syntactically invalid AST, an exception derived from
 `ParserException`
-will be thrown.
+will be thrown:
+- `ArgumentCountException`
+- `CastingException`
+- `LiteralTypeException`
+- `NodeTypeException`
+- `TokenOutOfBoundsException`
+- `UnexpectedTokenException`
+- `ValueTypeException`
 
-For example, if an expression is incomplete or there's a mismatch in parentheses, a
-`UnexpectedTokenException`
-will be thrown. If there's an invocation of a function with a mismatching number of arguments, an
-`ArgumentCountError` 
-will be thrown. If a literal operand cannot be correctly parsed into the type its token represents, a
-`CastingException` will be thrown.
+If the AST is syntactically valid, but a semantic error is found when processing it, a 
+`SemanticException`
+will be thrown:
+- `InvalidAstException`
+- `InvalidRegExpException`
+- `UnknownPropertyException`
 
 ## Coverage of the OData 4.0 protocol
 

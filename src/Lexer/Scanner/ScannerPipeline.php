@@ -33,7 +33,7 @@ final readonly class ScannerPipeline implements Scanner
 
     public function eof(): bool
     {
-        return is_null($this->source) || $this->source->eof();
+        return $this->source?->eof() ?? true;
     }
 
     /**

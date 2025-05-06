@@ -60,6 +60,9 @@ final class SpecialCharScannerTest extends TestCase
     public static function provideScannableSpecialChar(): array
     {
         return [
+            'minus' => [
+                SpecialChar::Minus,
+            ],
             'open parentheses' => [
                 SpecialChar::OpenParen,
             ],

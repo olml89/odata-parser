@@ -36,8 +36,14 @@ final class NumericScannerTest extends TestCase
             'int' => [
                 '12',
             ],
+            'negative int' => [
+                '-12',
+            ],
             'float' => [
                 '3.1416',
+            ],
+            'negative float' => [
+                '-3.1416',
             ],
         ];
     }

@@ -10,10 +10,10 @@ use olml89\ODataParser\Lexer\Token\TokenKind;
 use olml89\ODataParser\Lexer\Token\ValueToken;
 use olml89\ODataParser\Parser\Node\Literal;
 use olml89\ODataParser\Parser\Node\Node;
-use olml89\ODataParser\Parser\Node\Operator\Comparison\Equal;
-use olml89\ODataParser\Parser\Node\Operator\Logical\AndOperator;
-use olml89\ODataParser\Parser\Node\Operator\Logical\NotOperator;
-use olml89\ODataParser\Parser\Node\Operator\Logical\OrOperator;
+use olml89\ODataParser\Parser\Node\Expression\Comparison\Equal;
+use olml89\ODataParser\Parser\Node\Expression\Logical\AndExpression;
+use olml89\ODataParser\Parser\Node\Expression\Logical\NotExpression;
+use olml89\ODataParser\Parser\Node\Expression\Logical\OrExpression;
 use olml89\ODataParser\Parser\Node\Property;
 use olml89\ODataParser\Parser\Node\Value\StringValue;
 
@@ -26,9 +26,9 @@ final readonly class LogicalProvider implements NodeAndExpectedTokensProvider
     {
         return [
             'not' => [
-                new NotOperator(
+                new NotExpression(
                     new Equal(
-                        new Property('identifier'),
+                        Property::from('identifier'),
                         new Literal(new StringValue('abcde')),
                     ),
                 ),
@@ -46,13 +46,13 @@ final readonly class LogicalProvider implements NodeAndExpectedTokensProvider
                 new OperatorToken(TokenKind::CloseParen),
             ],
             'and' => [
-                new AndOperator(
+                new AndExpression(
                     new Equal(
-                        new Property('identifier'),
+                        Property::from('identifier'),
                         new Literal(new StringValue('abcde')),
                     ),
                     new Equal(
-                        new Property('identifier'),
+                        Property::from('identifier'),
                         new Literal(new StringValue('xyz')),
                     ),
                 ),
@@ -79,13 +79,13 @@ final readonly class LogicalProvider implements NodeAndExpectedTokensProvider
                 new OperatorToken(TokenKind::CloseParen),
             ],
             'or' => [
-                new OrOperator(
+                new OrExpression(
                     new Equal(
-                        new Property('identifier'),
+                        Property::from('identifier'),
                         new Literal(new StringValue('abcde')),
                     ),
                     new Equal(
-                        new Property('identifier'),
+                        Property::from('identifier'),
                         new Literal(new StringValue('xyz')),
                     ),
                 ),

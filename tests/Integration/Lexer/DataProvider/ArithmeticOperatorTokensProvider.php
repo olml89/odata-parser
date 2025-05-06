@@ -16,10 +16,6 @@ final readonly class ArithmeticOperatorTokensProvider implements InputAndExpecte
     public static function provide(): array
     {
         return [
-            'minus' => [
-                '-',
-                new OperatorToken(TokenKind::Minus),
-            ],
             'multiplication' => [
                 'mul',
                 new OperatorToken(TokenKind::Mul),

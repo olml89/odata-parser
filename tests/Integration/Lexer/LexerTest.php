@@ -34,6 +34,7 @@ use Tests\Integration\Lexer\DataProvider\ComparisonOperatorTokensProvider;
 use Tests\Integration\Lexer\DataProvider\FunctionTokensProvider;
 use Tests\Integration\Lexer\DataProvider\LiteralTokensProvider;
 use Tests\Integration\Lexer\DataProvider\LogicalOperatorTokensProvider;
+use Tests\Integration\Lexer\DataProvider\PropertyTokensProvider;
 use Tests\Integration\Lexer\DataProvider\SpecialCharTokensProvider;
 
 #[CoversClass(Lexer::class)]
@@ -107,7 +108,7 @@ final class LexerTest extends TestCase
         $lexer = new Lexer($unterminatedString);
 
         $this->expectExceptionObject(
-            new UnterminatedStringException(),
+            new UnterminatedStringException($unterminatedString),
         );
 
         $lexer->tokenize();
@@ -119,6 +120,7 @@ final class LexerTest extends TestCase
     #[DataProviderExternal(ComparisonOperatorTokensProvider::class, 'provide')]
     #[DataProviderExternal(LogicalOperatorTokensProvider::class, 'provide')]
     #[DataProviderExternal(CollectionOperatorTokensProvider::class, 'provide')]
+    #[DataProviderExternal(PropertyTokensProvider::class, 'provide')]
     #[DataProviderExternal(LiteralTokensProvider::class, 'provide')]
     public function testItTokenizesInput(string $input, Token ...$expectedTokens): void
     {
